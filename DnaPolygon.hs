@@ -5,7 +5,7 @@ import Tools
 import DnaBrush
 import DnaPoint
 
-data DnaPolygon = DnaPolygon DnaBrush [DnaPoint]
+data DnaPolygon = DnaPolygon DnaBrush [DnaPoint] deriving (Show)
 
 polygonBrush :: DnaPolygon -> DnaBrush
 polygonBrush (DnaPolygon brush _) = brush

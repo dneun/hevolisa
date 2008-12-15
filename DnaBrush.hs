@@ -3,7 +3,7 @@ module DnaBrush where
 import Settings
 import Tools
 
--- |Mutable brush (red greem blue alpha)
+-- |Mutable brush (red green blue alpha)
 data DnaBrush = DnaBrush Integer Integer Integer Integer deriving (Show)
 
 -- |Brush is mutable

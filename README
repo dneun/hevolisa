@@ -1,0 +1,10 @@
+README
+
+HEvoLisa is a Haskell port of the EvoLisa program which can be found here: 
+
+http://rogeralsing.com/2008/12/07/genetic-programming-evolution-of-mona-lisa/
+[Genetic Programming: Evolution of Mona Lisa - Roger Alsing Weblog].
+
+The source code (C#) can be found in the FAQ section.
+
+The Haskell code is still very ad-hoc, I'm planning to clean it up and rework the module organisation.

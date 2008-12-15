@@ -139,19 +139,15 @@ maybeMutatePoint :: Integer -> IO Point -> Point -> IO Point
 maybeMutatePoint rate action unchanged = do mutate <- willMutate rate
                                             if mutate then action else return unchanged
 
-
-randomMid = getRandomNumber (-activeMovePointRangeMid) activeMovePointRangeMid
-randomMin = getRandomNumber (-activeMovePointRangeMin) activeMovePointRangeMin
-
 midX, midY, minX, minY :: Integer -> IO Integer
-midX x = mutateDim x maxWidth randomMid
-midY y = mutateDim y maxHeight randomMid
+midX = mutateDim activeMovePointRangeMid maxWidth
+midY = mutateDim activeMovePointRangeMid maxHeight
+minX = mutateDim activeMovePointRangeMin maxWidth
+minY = mutateDim activeMovePointRangeMin maxHeight
 
-minX x = mutateDim x maxWidth randomMin
-minY y = mutateDim y maxHeight randomMin
-
-mutateDim :: Integer -> Integer -> IO Integer -> IO Integer
-mutateDim dim maxDim random = random >>= \random -> return (min (max 0 (dim + random)) maxDim)
+mutateDim :: Integer -> Integer -> Integer -> IO Integer
+mutateDim range maxn n = do random <- getRandomNumber (-range) range
+                            return (min (max 0 (n + random)) maxn)
                   
 --instance Mutable (Color a) where
 --    mutate c = return c

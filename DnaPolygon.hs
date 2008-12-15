@@ -1,6 +1,7 @@
 module DnaPolygon where
 
 import Settings
+import Tools
 import DnaBrush
 import DnaPoint
 
@@ -27,3 +28,13 @@ randomPoint (DnaPoint x y) = do x <- mutateDim 3 maxWidth x
                                 y <- mutateDim 3 maxHeight y
                                 return (DnaPoint x y)
 
+instance Mutable DnaPolygon where
+    mutate = mutatePolygon
+
+mutatePolygon :: DnaPolygon -> IO DnaPolygon
+mutatePolygon p = maybeAddPoint p >>= maybeRemovePoint >>= mutateBrushInP >>= mutatePoints
+
+maybeAddPoint = undefined
+maybeRemovePoint = undefined
+mutateBrushInP = undefined
+mutatePoints = undefined

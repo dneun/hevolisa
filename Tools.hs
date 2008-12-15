@@ -26,7 +26,3 @@ maybeMutate rate action unchanged = do mutate <- willMutate rate
 -- |Instances of Mutable can mutate their DNA
 class Mutable a where
     mutate :: a -> IO a
-
-maxPolygons = 250
-maxWidth = 200
-maxHeight = 200

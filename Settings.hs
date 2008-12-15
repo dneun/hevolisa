@@ -21,3 +21,9 @@ activeGreenRangeMin = 0
 activeRedMutationRate = 1500
 activeRedRangeMax = 255
 activeRedRangeMin = 0
+
+activePointsPerPolygonMax = 10
+activePointsPerPolygonMin = 3
+
+maxWidth = 200
+maxHeight = 200

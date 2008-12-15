@@ -3,11 +3,14 @@ module DnaBrush where
 import Settings
 import Tools
 
+-- |Mutable brush (red greem blue alpha)
 data DnaBrush = DnaBrush Integer Integer Integer Integer deriving (Show)
 
+-- |Brush is mutable
 instance Mutable DnaBrush where
     mutate = mutateBrush
 
+-- |Initialize brush with random garbage
 initBrush :: IO DnaBrush
 initBrush = do r <- getRandomNumber 0 255
                g <- getRandomNumber 0 255
@@ -15,6 +18,7 @@ initBrush = do r <- getRandomNumber 0 255
                a <- getRandomNumber 10 60
                return (DnaBrush r g b a)
 
+-- |Change the brush values in a semi random way, rates can be adjusted
 mutateBrush :: DnaBrush -> IO DnaBrush
 mutateBrush (DnaBrush r g b a) = do r <- maybeMutate_ r activeRedMutationRate 
                                          activeRedRangeMin activeRedRangeMax
@@ -26,5 +30,10 @@ mutateBrush (DnaBrush r g b a) = do r <- maybeMutate_ r activeRedMutationRate
                                          activeAlphaRangeMin activeAlphaRangeMax
                                     return (DnaBrush r g b a)
 
-maybeMutate_ :: Integer -> Integer -> Integer -> Integer -> IO Integer
+-- |Mutate a one-dimensional value
+maybeMutate_ :: Integer    -- ^ The unchanged value to pass through
+             -> Integer    -- ^ Mutation rate
+             -> Integer    -- ^ Minimum for random numbers
+             -> Integer    -- ^ Maximum for random numbers
+             -> IO Integer -- ^ Changed value
 maybeMutate_ unchanged rate min max = maybeMutate rate (getRandomNumber min max) unchanged

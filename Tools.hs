@@ -1,4 +1,9 @@
-module Tools where
+module Tools (
+              Mutable,
+              willMutate,
+              maybeMutate,
+              getRandomNumber
+) where
 
 import Random
 

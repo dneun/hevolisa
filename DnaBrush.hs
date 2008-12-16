@@ -1,4 +1,10 @@
-module DnaBrush where
+module DnaBrush (
+                 DnaBrush,
+                         
+                 -- Constructors, mutate
+                 initBrush,
+                 mutateBrush
+) where
 
 import Settings
 import Tools

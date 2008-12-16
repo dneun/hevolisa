@@ -1,4 +1,14 @@
-module DnaPoint where
+module DnaPoint (
+                 DnaPoint,
+
+                 -- Accessors
+                 pointX,
+                 pointY,
+
+                 -- Constructors, mutate
+                 initPoint,
+                 mutatePoint
+                ) where
 
 import Settings
 import Tools

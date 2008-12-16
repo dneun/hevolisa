@@ -1,4 +1,14 @@
-module DnaPolygon where
+module DnaPolygon (
+                   DnaPolygon,
+
+                   -- Accessors
+                   polygonBrush,
+                   polygonPoints,
+
+                   -- Constructor, mutation
+                   initPolygon,
+                   mutatePolygon
+                  ) where
 
 import Settings
 import Tools

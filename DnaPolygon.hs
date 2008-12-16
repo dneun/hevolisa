@@ -78,7 +78,14 @@ removePoint index pts = left ++ right
     where left  = take index pts
           right = drop (index + 1) pts
 
-maybeRemovePoint = undefined
+maybeRemovePoint :: DnaPolygon -> IO DnaPolygon
+maybeRemovePoint p = if (polygonPointsCount p > activePointsPerPolygonMin) then
+                         removePointAtRandomIndex p
+                     else return p
+
+removePointAtRandomIndex :: DnaPolygon -> IO DnaPolygon
+removePointAtRandomIndex p@(DnaPolygon b pts) = do index <- getRandomNumber 0 (polygonPointsCount p)
+                                                   return (DnaPolygon b (removePoint index pts))
 
 mutateBrushInP :: DnaPolygon -> IO DnaPolygon
 mutateBrushInP p@(DnaPolygon brush pts) = mutate brush >>= \b -> return (DnaPolygon b pts)

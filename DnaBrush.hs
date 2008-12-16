@@ -7,7 +7,7 @@ module DnaBrush (
 ) where
 
 import Settings
-import Tools
+import Tools ( Mutable( mutate ), maybeMutate, getRandomNumber )
 
 -- |Mutable brush (red green blue alpha)
 data DnaBrush = DnaBrush Integer Integer Integer Integer deriving (Show)

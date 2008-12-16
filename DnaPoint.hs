@@ -1,5 +1,5 @@
 module DnaPoint (
-                 DnaPoint,
+                 DnaPoint (DnaPoint),
 
                  -- Accessors
                  pointX,
@@ -7,7 +7,8 @@ module DnaPoint (
 
                  -- Constructors, mutate
                  initPoint,
-                 mutatePoint
+                 mutatePoint,
+                 randomPoint
                 ) where
 
 import Settings
@@ -66,3 +67,9 @@ mutateDim :: Integer    -- ^ Randomisation range
           -> IO Integer -- ^ New value (action)
 mutateDim range maxn n = do random <- getRandomNumber (-range) range
                             return (min (max 0 (n + random)) maxn)
+
+-- |Create a random point using another point
+randomPoint :: DnaPoint -> IO DnaPoint
+randomPoint (DnaPoint x y) = do x <- mutateDim 3 maxWidth x
+                                y <- mutateDim 3 maxHeight y
+                                return (DnaPoint x y)

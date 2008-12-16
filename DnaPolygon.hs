@@ -11,9 +11,9 @@ module DnaPolygon (
                   ) where
 
 import Settings
-import Tools
-import DnaBrush
-import DnaPoint
+import Tools ( Mutable( mutate ) )
+import DnaBrush ( DnaBrush, initBrush)
+import DnaPoint ( DnaPoint, initPoint, randomPoint)
 
 -- |A polygon has a brush for color and a list of points
 data DnaPolygon = DnaPolygon DnaBrush [DnaPoint] deriving (Show)
@@ -38,12 +38,6 @@ randomPoints :: Integer       -- ^ Number of points
 randomPoints n = do origin <- initPoint
                     points <- sequence $ replicate (fromIntegral n) (randomPoint origin)
                     return points
-
--- |Create a random point using another point
-randomPoint :: DnaPoint -> IO DnaPoint
-randomPoint (DnaPoint x y) = do x <- mutateDim 3 maxWidth x
-                                y <- mutateDim 3 maxHeight y
-                                return (DnaPoint x y)
 
 -- |A polygon has mutable DNA
 instance Mutable DnaPolygon where

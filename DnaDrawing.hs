@@ -20,7 +20,7 @@ mapseq f []     = f
 mapseq s (f:fs) = mapseq (s >>= f) fs
 
 initDrawing :: IO DnaDrawing
-initDrawing = do polygons <- mapseq (sequence [initPolygon]) 
+initDrawing = do polygons <- mapseq (return []) 
                              (replicate (fromIntegral activePolygonsMin) addPolygon)
                  return (DnaDrawing polygons)
 

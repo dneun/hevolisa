@@ -1,13 +1,12 @@
 module Settings where
 
+activeAddPointMutationRate = 1500
 activeMovePointMaxMutationRate = 1500
 activeMovePointMidMutationRate = 1500
 activeMovePointMinMutationRate = 1500
 activeMovePointRangeMid = 20.0
 activeMovePointRangeMin = 3.0
-
-
-
+activeRemovePointMutationRate = 1500
 activeAlphaMutationRate = 1500
 activeAlphaRangeMax = 60
 activeAlphaRangeMin = 30

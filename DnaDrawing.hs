@@ -15,7 +15,7 @@ drawingPolygonsCount = fromIntegral . length . drawingPolygons
 drawingPointCount :: DnaDrawing -> Integer
 drawingPointCount = sum . map polygonPointsCount . drawingPolygons
 
-mapseq :: IO a -> [(a -> IO a)]-> IO a
+mapseq :: Monad m => m a -> [(a -> m a)]-> m a
 mapseq f []     = f
 mapseq s (f:fs) = mapseq (s >>= f) fs
 

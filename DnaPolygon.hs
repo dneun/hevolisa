@@ -12,7 +12,7 @@ module DnaPolygon (
 
 import Settings
 import Tools ( Mutable( mutate ), getRandomNumber )
-import DnaBrush ( DnaBrush, initBrush)
+import DnaBrush ( DnaBrush, initBrush )
 import DnaPoint ( DnaPoint( DnaPoint ), initPoint, randomPoint, pointX, pointY )
 
 -- |A polygon has a brush for color and a list of points
@@ -79,5 +79,10 @@ removePoint index pts = left ++ right
           right = drop (index + 1) pts
 
 maybeRemovePoint = undefined
-mutateBrushInP = undefined
-mutatePoints = undefined
+
+mutateBrushInP :: DnaPolygon -> IO DnaPolygon
+mutateBrushInP p@(DnaPolygon brush pts) = mutate brush >>= \b -> return (DnaPolygon b pts)
+
+mutatePoints :: DnaPolygon -> IO DnaPolygon
+mutatePoints p@(DnaPolygon b pts) = do points <- sequence $ map mutate pts
+                                       return (DnaPolygon b points)

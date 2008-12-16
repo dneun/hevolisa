@@ -38,9 +38,16 @@ instance Mutable DnaDrawing where
     mutate = mutateDrawing
 
 mutateDrawing :: DnaDrawing -> IO DnaDrawing
-mutateDrawing d = maybeAddPolygon >>= maybeRemovePolygon >>= maybeMovePolygon >>= mutatePolygons
+mutateDrawing d = maybeAddPolygon d >>= maybeRemovePolygon >>= maybeMovePolygon >>= mutatePolygons
 
+maybeAddPolygon :: DnaDrawing -> IO DnaDrawing
 maybeAddPolygon = undefined
+
+maybeRemovePolygon :: DnaDrawing -> IO DnaDrawing
 maybeRemovePolygon = undefined
+
+maybeMovePolygon :: DnaDrawing -> IO DnaDrawing
 maybeMovePolygon = undefined
+
+mutatePolygons :: DnaDrawing -> IO DnaDrawing
 mutatePolygons = undefined

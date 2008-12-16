@@ -26,6 +26,10 @@ polygonBrush (DnaPolygon brush _) = brush
 polygonPoints :: DnaPolygon -> [DnaPoint]
 polygonPoints (DnaPolygon _ points) = points
 
+-- |Count the points of the polygon
+polygonPointsCount :: Integral a => DnaPolygon -> a
+polygonPointsCount = fromIntegral . length . polygonPoints
+
 -- |Initialize the polygon with random garbage
 initPolygon :: IO DnaPolygon
 initPolygon = do points <- randomPoints activePointsPerPolygonMin
@@ -47,10 +51,18 @@ instance Mutable DnaPolygon where
 mutatePolygon :: DnaPolygon -> IO DnaPolygon
 mutatePolygon p = maybeAddPoint p >>= maybeRemovePoint >>= mutateBrushInP >>= mutatePoints
 
--- |Coming soon...
-maybeAddPoint p = undefined --do if (sum $ polygonPoints p < activePointsPerPolygonMax) then
+-- |Add a point if we are still below the maximum
+maybeAddPoint :: DnaPolygon -> IO DnaPolygon
+maybeAddPoint p = if (polygonPointsCount p < activePointsPerPolygonMax) then
+                     addPointAtRandomIndex p
+                  else return p
 
+-- |Add a point at a random position between two points
+addPointAtRandomIndex :: DnaPolygon -> IO DnaPolygon
+addPointAtRandomIndex p@(DnaPolygon b pts) = do index <- getRandomNumber 0 (polygonPointsCount p - 1)
+                                                return (DnaPolygon b (addPoint index pts))
 
+-- |Add a point at the given position
 addPoint :: Int -> [DnaPoint] -> [DnaPoint]
 addPoint index pts = left ++ [DnaPoint newX newY] ++ right
     where left = take index pts
@@ -60,6 +72,7 @@ addPoint index pts = left ++ [DnaPoint newX newY] ++ right
           prev = last left
           next = head right
 
+-- |Remove a point form the polygon
 removePoint :: Int -> [DnaPoint] -> [DnaPoint]
 removePoint index pts = left ++ right
     where left  = take index pts

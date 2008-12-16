@@ -1,7 +1,7 @@
 module DnaDrawing where
 
 import DnaPolygon ( DnaPolygon, polygonPointsCount, initPolygon )
-import Tools ( getRandomNumber )
+import Tools ( Mutable ( mutate ), getRandomNumber )
 import Settings
 
 data DnaDrawing = DnaDrawing [DnaPolygon] deriving (Show)
@@ -33,3 +33,14 @@ addPolygon :: [DnaPolygon] -> IO [DnaPolygon]
 addPolygon ps = do random <- getRandomNumber 0 (length ps)
                    polygon <- initPolygon
                    return (insertPolygon random polygon ps)
+
+instance Mutable DnaDrawing where
+    mutate = mutateDrawing
+
+mutateDrawing :: DnaDrawing -> IO DnaDrawing
+mutateDrawing d = maybeAddPolygon >>= maybeRemovePolygon >>= maybeMovePolygon >>= mutatePolygons
+
+maybeAddPolygon = undefined
+maybeRemovePolygon = undefined
+maybeMovePolygon = undefined
+mutatePolygons = undefined

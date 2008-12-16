@@ -2,6 +2,7 @@ module DnaDrawing where
 
 import DnaPolygon ( DnaPolygon, polygonPointsCount, initPolygon )
 import Tools ( getRandomNumber )
+import Settings
 
 data DnaDrawing = DnaDrawing [DnaPolygon] deriving (Show)
 
@@ -14,9 +15,14 @@ drawingPolygonsCount = fromIntegral . length . drawingPolygons
 drawingPointCount :: DnaDrawing -> Integer
 drawingPointCount = sum . map polygonPointsCount . drawingPolygons
 
+mapseq :: IO a -> [(a -> IO a)]-> IO a
+mapseq f []     = f
+mapseq s (f:fs) = mapseq (s >>= f) fs
+
 initDrawing :: IO DnaDrawing
---initDrawing = do polygons <-
-initDrawing = undefined
+initDrawing = do polygons <- mapseq (sequence [initPolygon]) 
+                             (replicate (fromIntegral activePolygonsMin) addPolygon)
+                 return (DnaDrawing polygons)
 
 insertPolygon :: Int -> DnaPolygon -> [DnaPolygon] -> [DnaPolygon]
 insertPolygon index new lst = left ++ [new] ++ right

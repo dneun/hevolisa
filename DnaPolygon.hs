@@ -59,7 +59,7 @@ maybeAddPoint p = if (polygonPointsCount p < activePointsPerPolygonMax) then
 
 -- |Add a point at a random position between two points
 addPointAtRandomIndex :: DnaPolygon -> IO DnaPolygon
-addPointAtRandomIndex p@(DnaPolygon b pts) = do index <- getRandomNumber 0 (polygonPointsCount p - 1)
+addPointAtRandomIndex p@(DnaPolygon b pts) = do index <- getRandomNumber 1 (polygonPointsCount p - 1)
                                                 return (DnaPolygon b (addPoint index pts))
 
 -- |Add a point at the given position

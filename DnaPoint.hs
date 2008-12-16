@@ -15,14 +15,14 @@ import Settings
 import Tools
 
 -- |Mutable Point
-data DnaPoint = DnaPoint Integer Integer deriving (Show,Eq)
+data DnaPoint = DnaPoint Double Double deriving (Show,Eq)
 
 -- |X value of the point
-pointX :: DnaPoint -> Integer
+pointX :: DnaPoint -> Double
 pointX (DnaPoint x _) = x
 
 -- |Y value of the point
-pointY :: DnaPoint -> Integer
+pointY :: DnaPoint -> Double
 pointY (DnaPoint _ y) = y
 
 -- |DnaPoint is mutable
@@ -31,8 +31,8 @@ instance Mutable DnaPoint where
 
 -- |Initialize point with random garbage
 initPoint :: IO DnaPoint
-initPoint = do x <- getRandomNumber 0 maxWidth
-               y <- getRandomNumber 0 maxHeight
+initPoint = do x <- getRandomNumber 0.0 maxWidth
+               y <- getRandomNumber 0.0 maxHeight
                return (DnaPoint x y)
 
 -- |Mutate points dna randomly, rates can be adjusted
@@ -45,8 +45,8 @@ mutatePoint p = mutateMax p >>= mutateMid >>= mutateMin
                         (pointFunction minX minY p) p
 
 -- |Change the x and y values of the point with functions
-pointFunction :: (Integer -> IO Integer) -- ^ Function to change the x value
-              -> (Integer -> IO Integer) -- ^ Function to change the y value
+pointFunction :: (Double -> IO Double) -- ^ Function to change the x value
+              -> (Double -> IO Double) -- ^ Function to change the y value
               -> DnaPoint                -- ^ Original point
               -> IO DnaPoint             -- ^ Changed point (action)
 pointFunction xFunction yFunction p = do x <- xFunction $ pointX p
@@ -54,17 +54,17 @@ pointFunction xFunction yFunction p = do x <- xFunction $ pointX p
                                          return (DnaPoint x y)
 
 -- |Helper functions for different ranges
-midX, midY, minX, minY :: Integer -> IO Integer
+midX, midY, minX, minY :: Double -> IO Double
 midX = mutateDim activeMovePointRangeMid maxWidth
 midY = mutateDim activeMovePointRangeMid maxHeight
 minX = mutateDim activeMovePointRangeMin maxWidth
 minY = mutateDim activeMovePointRangeMin maxHeight
 
 -- |Mutate a one-dimensional value
-mutateDim :: Integer    -- ^ Randomisation range
-          -> Integer    -- ^ Maximum
-          -> Integer    -- ^ Original value
-          -> IO Integer -- ^ New value (action)
+mutateDim :: Double    -- ^ Randomisation range
+          -> Double    -- ^ Maximum
+          -> Double    -- ^ Original value
+          -> IO Double -- ^ New value (action)
 mutateDim range maxn n = do random <- getRandomNumber (-range) range
                             return (min (max 0 (n + random)) maxn)
 

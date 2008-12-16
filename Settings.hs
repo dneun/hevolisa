@@ -3,8 +3,8 @@ module Settings where
 activeMovePointMaxMutationRate = 1500
 activeMovePointMidMutationRate = 1500
 activeMovePointMinMutationRate = 1500
-activeMovePointRangeMid = 20
-activeMovePointRangeMin = 3
+activeMovePointRangeMid = 20.0
+activeMovePointRangeMin = 3.0
 
 
 
@@ -25,5 +25,5 @@ activeRedRangeMin = 0
 activePointsPerPolygonMax = 10
 activePointsPerPolygonMin = 3
 
-maxWidth = 200
-maxHeight = 200
+maxWidth = 200.0
+maxHeight = 200.0

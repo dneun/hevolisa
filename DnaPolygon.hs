@@ -51,7 +51,7 @@ instance Mutable DnaPolygon where
 mutatePolygon :: DnaPolygon -> IO DnaPolygon
 mutatePolygon p = maybeAddPoint p >>= maybeRemovePoint >>= mutateBrushInP >>= mutatePoints
 
--- |Add a point if we are still below the maximum
+-- |Add a point if it`s time to do so
 maybeAddPoint :: DnaPolygon -> IO DnaPolygon
 maybeAddPoint p = do mutate <- willMutate activeAddPointMutationRate
                      if (mutate && polygonPointsCount p < activePointsPerPolygonMax) then 
@@ -72,13 +72,13 @@ addPoint index pts = left ++ [DnaPoint newX newY] ++ right
           prev = last left
           next = head right
 
--- |Remove a point form the polygon
+-- |Remove a point from the polygon
 removePoint :: Int -> [DnaPoint] -> [DnaPoint]
 removePoint index pts = left ++ right
     where left  = take index pts
           right = drop (index + 1) pts
 
--- |Remove a point if we`re above the lower bound
+-- |Remove a point if it`s time to do so
 maybeRemovePoint :: DnaPolygon -> IO DnaPolygon
 maybeRemovePoint p = do mutate <- willMutate activeRemovePointMutationRate
                         if (mutate && polygonPointsCount p > activePointsPerPolygonMin) then

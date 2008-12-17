@@ -1,15 +1,9 @@
 module DnaDrawing (
                    DnaDrawing,
 
-                   -- Accessor functions
-                   drawingPolygons,
-                   drawingPolygonsCount,
-                   drawingPointCount,
-
-                   -- Constructors, mutate
-                   initDrawing,
-                   mutateDrawing
-)where
+                   -- Constructors
+                   initDrawing
+) where
 
 import DnaPolygon ( DnaPolygon, polygonPointsCount, initPolygon )
 import Tools ( Mutable ( mutate ), getRandomNumber )

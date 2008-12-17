@@ -12,7 +12,7 @@ import Tools
 import Settings
 
 -- |A drawing contains an ordered set of polygons
-data DnaDrawing = DnaDrawing [DnaPolygon] deriving (Show)
+data DnaDrawing = DnaDrawing [DnaPolygon] deriving (Show,Eq)
 
 -- |Get the polygons of a drawing
 drawingPolygons :: DnaDrawing -> [DnaPolygon]

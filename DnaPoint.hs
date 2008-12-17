@@ -15,7 +15,7 @@ import Settings
 import Tools
 
 -- |Mutable Point
-data DnaPoint = DnaPoint Double Double deriving (Show,Eq)
+data DnaPoint = DnaPoint Double Double deriving (Show,Eq,Read)
 
 -- |X value of the point
 pointX :: DnaPoint -> Double

@@ -10,7 +10,7 @@ import Settings
 import Tools ( Mutable( mutate ), maybeMutate, getRandomNumber )
 
 -- |Mutable brush (red green blue alpha)
-data DnaBrush = DnaBrush Integer Integer Integer Integer deriving (Show,Eq)
+data DnaBrush = DnaBrush Integer Integer Integer Integer deriving (Show,Eq,Read)
 
 -- |Brush is mutable
 instance Mutable DnaBrush where

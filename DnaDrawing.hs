@@ -33,9 +33,10 @@ mapseq s (f:fs) = mapseq (s >>= f) fs
 
 -- |Construct and init a new Drawing
 initDrawing :: IO DnaDrawing
-initDrawing = do polygons <- mapseq (return []) 
-                             (replicate (fromIntegral activePolygonsMin) addPolygon)
+initDrawing = do polygons <- mseq $ replicate min addPolygon
                  return (DnaDrawing polygons)
+                     where min = fromIntegral activePolygonsMin
+                           mseq = mapseq (return [])
 
 -- |Add a new polygon at a random position
 addPolygon :: [DnaPolygon] -> IO [DnaPolygon]

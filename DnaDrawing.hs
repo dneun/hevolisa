@@ -75,12 +75,21 @@ maybeAddPolygon d = maybeMutate activeAddPolygonMutationRate
                     
 -- |Remove a polygon if it`s time to do so and the constraints are met
 maybeRemovePolygon :: DnaDrawing -> IO DnaDrawing
-maybeRemovePolygon = undefined
+maybeRemovePolygon d = maybeMutate activeRemovePolygonMutationRate
+                       (if (drawingPolygonsCount d > activePolygonsMin) then
+                            applyToPolygons removePolygon d else return d)
+                       d
 
 -- |Move a polygon if it`s time to do so and the constraints are met
 maybeMovePolygon :: DnaDrawing -> IO DnaDrawing
-maybeMovePolygon = undefined
+maybeMovePolygon d = maybeMutate activeMovePolygonMutationRate
+                     (if (drawingPolygonsCount d > 0) then
+                          applyToPolygons movePolygon d else return d)
+                     d
 
 -- |Mutate polygons if it`s time to do so and the constraints are met
 mutatePolygons :: DnaDrawing -> IO DnaDrawing
 mutatePolygons = undefined
+
+removePolygon = undefined
+movePolygon = undefined

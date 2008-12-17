@@ -6,15 +6,15 @@ import Tools
 
 generations = 10000
 
-start = mapseq initDrawing (replicate generations evolve)
+start = mapseq initDrawing (replicate generations step)
 
 -- |Smaller is better
 error :: DnaDrawing -> Double
 error = undefined
 
 -- |Single evloution step
-evolve :: DnaDrawing -> IO DnaDrawing
-evolve d = mutate d >>= \next -> return (min d next)
+step :: DnaDrawing -> IO DnaDrawing
+step d = mutate d >>= \next -> return (min d next)
 
 -- |Compare Drawings by fitness
 instance Ord DnaDrawing where
@@ -22,3 +22,9 @@ instance Ord DnaDrawing where
         | error x == error y = EQ
         | error x <= error y = LT
         | otherwise          = GT
+
+-- TODO: Maybe step, error and Ord instance should be defined on some
+-- kind of context which contains the image which is used to compute
+-- the error
+--
+-- The error function must have the image as a parameter

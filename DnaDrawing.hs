@@ -3,7 +3,8 @@ module DnaDrawing (
                    DnaDrawing,
 
                    -- Constructors
-                   initDrawing
+                   initDrawing,
+                   mapseq
 ) where
 
 import DnaPolygon ( DnaPolygon, polygonPointsCount, initPolygon )

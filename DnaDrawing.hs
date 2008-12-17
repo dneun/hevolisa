@@ -8,7 +8,7 @@ module DnaDrawing (
 ) where
 
 import DnaPolygon ( DnaPolygon, polygonPointsCount, initPolygon )
-import Tools ( Mutable ( mutate ), getRandomNumber, maybeMutate, willMutate, addElem, removeElem, moveElemFromTo )
+import Tools
 import Settings
 
 -- |A drawing contains an ordered set of polygons

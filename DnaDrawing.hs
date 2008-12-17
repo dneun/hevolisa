@@ -27,7 +27,7 @@ drawingPointCount :: DnaDrawing -> Integer
 drawingPointCount = sum . map polygonPointsCount . drawingPolygons
 
 -- |Sequences functions that produce actions
-mapseq :: Monad m => m a -> [(a -> m a)]-> m a
+mapseq :: Monad m => m a -> [a -> m a] -> m a
 mapseq f []     = f
 mapseq s (f:fs) = mapseq (s >>= f) fs
 

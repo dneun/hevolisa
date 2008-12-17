@@ -89,7 +89,7 @@ maybeMovePolygon d = maybeMutate activeMovePolygonMutationRate
 
 -- |Mutate polygons if it`s time to do so and the constraints are met
 mutatePolygons :: DnaDrawing -> IO DnaDrawing
-mutatePolygons = undefined
+mutatePolygons = applyToPolygons (mapM mutate)
 
 removePolygon = undefined
 movePolygon = undefined

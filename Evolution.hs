@@ -4,27 +4,32 @@ import Prelude hiding (error)
 import DnaDrawing
 import Tools
 
+data EvolutionContext = EvolutionContext DnaDrawing SourceColorMatrix
+                        deriving (Show,Eq)
+data SourceColorMatrix = SourceColorMatrix deriving (Show,Eq)
+
 generations = 10000
 
-start = mapseq initDrawing (replicate generations step)
+initContext :: SourceColorMatrix -> IO EvolutionContext
+initContext s = initDrawing >>= \d -> return (EvolutionContext d s)
+
+start s = mapseq (initContext s) (replicate generations step)
 
 -- |Smaller is better
-error :: DnaDrawing -> Double
+error :: EvolutionContext -> Double
 error = undefined
 
 -- |Single evolution step
-step :: DnaDrawing -> IO DnaDrawing
-step d = mutate d >>= \next -> return (min d next)
+step :: EvolutionContext -> IO EvolutionContext
+step ec = mutate ec >>= \next -> return (min ec next)
 
--- |Compare Drawings by fitness
-instance Ord DnaDrawing where
+instance Mutable EvolutionContext where
+    mutate (EvolutionContext d s) = do m <- mutate d
+                                       return (EvolutionContext m s)
+
+-- |Compare EvolutionContext by error
+instance Ord EvolutionContext where
     compare x y
         | error x == error y = EQ
         | error x <= error y = LT
         | otherwise          = GT
-
--- TODO: Maybe step, error and Ord instance should be defined on some
--- kind of context which contains the image which is used to compute
--- the error
---
--- The error function must have the image as a parameter

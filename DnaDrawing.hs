@@ -1,3 +1,4 @@
+-- |Intended usage: @ initDrawing >>= mutate >>= mutate >>= mutate @
 module DnaDrawing (
                    DnaDrawing,
 

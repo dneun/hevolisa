@@ -7,7 +7,7 @@ module DnaDrawing (
 ) where
 
 import DnaPolygon ( DnaPolygon, polygonPointsCount, initPolygon )
-import Tools ( Mutable ( mutate ), getRandomNumber, maybeMutate, willMutate, removeElem, moveElemFromTo )
+import Tools ( Mutable ( mutate ), getRandomNumber, maybeMutate, willMutate, addElem, removeElem, moveElemFromTo )
 import Settings
 
 -- |A drawing contains an ordered set of polygons
@@ -40,16 +40,7 @@ initDrawing = do polygons <- mapseq (return [])
 addPolygon :: [DnaPolygon] -> IO [DnaPolygon]
 addPolygon ps = do random <- getRandomNumber 0 (length ps)
                    polygon <- initPolygon
-                   return (insertPolygon random polygon ps)
-
--- |Insert a polygon at the given posiiton
-insertPolygon :: Int          -- ^ Insert position
-              -> DnaPolygon   -- ^ Polygon to insert
-              -> [DnaPolygon] -- ^ Original set of polygons
-              -> [DnaPolygon] -- ^ Return new set with inserted polygon
-insertPolygon index new lst = left ++ [new] ++ right
-    where left = take index lst
-          right = drop index lst
+                   return (addElem polygon random ps)
 
 -- |Drawing has mutable DNA
 instance Mutable DnaDrawing where

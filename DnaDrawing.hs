@@ -84,11 +84,11 @@ mutatePolygons = applyToPolygons (mapM mutate)
 
 -- |Remove a polygon at a random index
 removePolygon :: [DnaPolygon] -> IO [DnaPolygon]
-removePolygon p = do index <- getRandomNumber 0 (length p)
+removePolygon p = do index <- getRandomNumber 0 (length p - 1)
                      return (removeElem index p)
                      
 -- |Move a polygon in the list of polygons
 movePolygon :: [DnaPolygon] -> IO [DnaPolygon]
-movePolygon p = do from <- getRandomNumber 0 (length p)
-                   to   <- getRandomNumber 0 (length p)
+movePolygon p = do from <- getRandomNumber 0 (length p - 1)
+                   to   <- getRandomNumber 0 (length p - 1)
                    return (moveElemFromTo from to p)

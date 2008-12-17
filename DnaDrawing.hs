@@ -68,9 +68,10 @@ mutateDrawing d = maybeAddPolygon d >>= maybeRemovePolygon >>= maybeMovePolygon 
 
 -- |Add a polygon if it`s time to do so and the constraints are met
 maybeAddPolygon :: DnaDrawing -> IO DnaDrawing
-maybeAddPolygon d  = do mutate <- willMutate activeAddPolygonMutationRate
-                        if (mutate && drawingPolygonsCount d < activePolygonsMax) then 
-                           applyToPolygons addPolygon d else applyToPolygons return d
+maybeAddPolygon d = maybeMutate activeAddPolygonMutationRate
+                    (if (drawingPolygonsCount d < activePolygonsMax) then 
+                         applyToPolygons addPolygon d else return d)
+                    d
                     
 -- |Remove a polygon if it`s time to do so and the constraints are met
 maybeRemovePolygon :: DnaDrawing -> IO DnaDrawing

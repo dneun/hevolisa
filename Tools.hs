@@ -2,7 +2,12 @@ module Tools (
               Mutable (mutate),
               willMutate,
               maybeMutate,
-              getRandomNumber
+              getRandomNumber,
+
+              -- List index functions
+              addElem,
+              removeElem,
+              moveElemFromTo
 ) where
 
 import Random
@@ -27,6 +32,24 @@ maybeMutate :: Integer  -- ^ Mutation rate
             -> IO a     -- ^ Composed action
 maybeMutate rate action unchanged = do mutate <- willMutate rate
                                        if mutate then action else return unchanged
+
+-- |Move a list element from index to index
+moveElemFromTo :: Int -> Int -> [a] -> [a]
+moveElemFromTo from to lst = addElem elem to $ removeElem from lst
+    where elem = lst !! from
+
+
+-- |Remove an item at index position from list
+removeElem :: Int -> [a] -> [a]
+removeElem n lst = left ++ right
+    where left = take n lst
+          right = drop (n + 1) lst
+
+-- |Add an item at index position to list
+addElem :: a -> Int -> [a] -> [a]
+addElem item index lst = left ++ [item] ++ right
+    where left = take index lst
+          right = drop index lst
 
 -- |Instances of Mutable can mutate their DNA
 class Mutable a where

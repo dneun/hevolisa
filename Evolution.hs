@@ -19,13 +19,18 @@ start s = mapseq (initContext s) (replicate generations step)
 error :: EvolutionContext -> Double
 error = undefined
 
--- |Single evolution step
-step :: EvolutionContext -> IO EvolutionContext
-step ec = mutate ec >>= \next -> return (min ec next)
-
+-- |EvolutionContext mutates minimizing the error
 instance Mutable EvolutionContext where
-    mutate (EvolutionContext d s) = do m <- mutate d
-                                       return (EvolutionContext m s)
+    mutate = step
+
+-- |Single evolution step, minimize error
+step :: EvolutionContext -> IO EvolutionContext
+step ec = mutateEvolutionContext ec >>= \next -> return (min ec next)
+
+-- |Mutate the drawing in the EvolutionContext
+mutateEvolutionContext :: EvolutionContext -> IO EvolutionContext
+mutateEvolutionContext (EvolutionContext d s) = do m <- mutate d
+                                                   return (EvolutionContext m s)
 
 -- |Compare EvolutionContext by error
 instance Ord EvolutionContext where

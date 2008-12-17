@@ -7,7 +7,7 @@ module DnaDrawing (
 ) where
 
 import DnaPolygon ( DnaPolygon, polygonPointsCount, initPolygon )
-import Tools ( Mutable ( mutate ), getRandomNumber, maybeMutate, willMutate, moveElemFromTo )
+import Tools ( Mutable ( mutate ), getRandomNumber, maybeMutate, willMutate, removeElem, moveElemFromTo )
 import Settings
 
 -- |A drawing contains an ordered set of polygons
@@ -93,12 +93,7 @@ mutatePolygons = applyToPolygons (mapM mutate)
 
 removePolygon :: [DnaPolygon] -> IO [DnaPolygon]
 removePolygon p = do index <- getRandomNumber 0 (length p)
-                     return (removePolygonAt index p)
-
-removePolygonAt :: Int -> [DnaPolygon] -> [DnaPolygon]
-removePolygonAt index pls = left ++ right
-    where left = drop index pls
-          right = take (index + 1) pls
+                     return (removeElem index p)
                      
 movePolygon :: [DnaPolygon] -> IO [DnaPolygon]
 movePolygon p = do from <- getRandomNumber 0 (length p)

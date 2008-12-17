@@ -12,7 +12,7 @@ start = mapseq initDrawing (replicate generations step)
 error :: DnaDrawing -> Double
 error = undefined
 
--- |Single evloution step
+-- |Single evolution step
 step :: DnaDrawing -> IO DnaDrawing
 step d = mutate d >>= \next -> return (min d next)
 

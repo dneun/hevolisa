@@ -47,8 +47,8 @@ mutatePoint p = mutateMax p >>= mutateMid >>= mutateMin
 -- |Change the x and y values of the point with functions
 pointFunction :: (Double -> IO Double) -- ^ Function to change the x value
               -> (Double -> IO Double) -- ^ Function to change the y value
-              -> DnaPoint                -- ^ Original point
-              -> IO DnaPoint             -- ^ Changed point (action)
+              -> DnaPoint              -- ^ Original point
+              -> IO DnaPoint           -- ^ Changed point (action)
 pointFunction xFunction yFunction p = do x <- xFunction $ pointX p
                                          y <- yFunction $ pointY p
                                          return (DnaPoint x y)

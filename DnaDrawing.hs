@@ -57,7 +57,10 @@ applyToPolygons action (DnaDrawing pls) = do newpls <- action pls
 
 -- |Basic drawing mutation function
 mutateDrawing :: DnaDrawing -> IO DnaDrawing
-mutateDrawing d = maybeAddPolygon d >>= maybeRemovePolygon >>= maybeMovePolygon >>= mutatePolygons
+mutateDrawing d = maybeAddPolygon d >>= 
+                  maybeRemovePolygon >>= 
+                  maybeMovePolygon >>= 
+                  mutatePolygons
 
 -- |Add a polygon if it`s time to do so and the constraints are met
 maybeAddPolygon :: DnaDrawing -> IO DnaDrawing

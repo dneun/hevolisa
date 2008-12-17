@@ -7,7 +7,7 @@ module DnaDrawing (
 ) where
 
 import DnaPolygon ( DnaPolygon, polygonPointsCount, initPolygon )
-import Tools ( Mutable ( mutate ), getRandomNumber )
+import Tools ( Mutable ( mutate ), getRandomNumber, maybeMutate, willMutate )
 import Settings
 
 -- |A drawing contains an ordered set of polygons
@@ -36,6 +36,12 @@ initDrawing = do polygons <- mapseq (return [])
                              (replicate (fromIntegral activePolygonsMin) addPolygon)
                  return (DnaDrawing polygons)
 
+-- |Add a new polygon at a random position
+addPolygon :: [DnaPolygon] -> IO [DnaPolygon]
+addPolygon ps = do random <- getRandomNumber 0 (length ps)
+                   polygon <- initPolygon
+                   return (insertPolygon random polygon ps)
+
 -- |Insert a polygon at the given posiiton
 insertPolygon :: Int          -- ^ Insert position
               -> DnaPolygon   -- ^ Polygon to insert
@@ -45,15 +51,16 @@ insertPolygon index new lst = left ++ [new] ++ right
     where left = take index lst
           right = drop index lst
 
--- |Add a new polygon at a random position
-addPolygon :: [DnaPolygon] -> IO [DnaPolygon]
-addPolygon ps = do random <- getRandomNumber 0 (length ps)
-                   polygon <- initPolygon
-                   return (insertPolygon random polygon ps)
-
 -- |Drawing has mutable DNA
 instance Mutable DnaDrawing where
     mutate = mutateDrawing
+
+-- |Apply a polygon function to a drawing
+applyToPolygons :: ([DnaPolygon] -> IO [DnaPolygon])
+                -> DnaDrawing
+                -> IO DnaDrawing
+applyToPolygons action (DnaDrawing pls) = do newpls <- action pls
+                                             return (DnaDrawing newpls)
 
 -- |Basic drawing mutation function
 mutateDrawing :: DnaDrawing -> IO DnaDrawing
@@ -61,8 +68,10 @@ mutateDrawing d = maybeAddPolygon d >>= maybeRemovePolygon >>= maybeMovePolygon 
 
 -- |Add a polygon if it`s time to do so and the constraints are met
 maybeAddPolygon :: DnaDrawing -> IO DnaDrawing
-maybeAddPolygon = undefined
-
+maybeAddPolygon d  = do mutate <- willMutate activeAddPolygonMutationRate
+                        if (mutate && drawingPolygonsCount d < activePolygonsMax) then 
+                           applyToPolygons addPolygon d else applyToPolygons return d
+                    
 -- |Remove a polygon if it`s time to do so and the constraints are met
 maybeRemovePolygon :: DnaDrawing -> IO DnaDrawing
 maybeRemovePolygon = undefined

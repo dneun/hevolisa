@@ -1,7 +1,7 @@
 module Settings where
 
 activeAddPointMutationRate = 1500
-
+activeAddPolygonMutationRate = 700
 activeAlphaMutationRate = 1500
 activeAlphaRangeMax = 60
 activeAlphaRangeMin = 30

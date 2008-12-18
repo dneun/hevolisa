@@ -20,9 +20,9 @@ start :: ColorMatrix -> IO EvolutionContext
 start s = mapseq (initContext s) (replicate generations step)
 
 -- |Color error, smaller is better
-error :: EvolutionContext -> Double
-error (EvolutionContext drawing source) = imageError renderedDrawing source
-    where renderedDrawing = renderDrawing drawing
+error :: EvolutionContext -> IO Double
+error (EvolutionContext drawing source) = renderDrawing drawing >>= \d ->
+                                          return (imageError d source)
 
 -- |EvolutionContext mutates minimizing the error
 instance Mutable EvolutionContext where
@@ -30,17 +30,12 @@ instance Mutable EvolutionContext where
 
 -- |Single evolution step, minimize error
 step :: EvolutionContext -> IO EvolutionContext
-step ec = mutateEvolutionContext ec >>= \next -> 
-          return (min ec next)
+step ec = do next <- mutateEvolutionContext ec
+             e1 <- error ec
+             e2 <- error next
+             if e1 < e2 then return ec else return next
 
 -- |Mutate the drawing in the EvolutionContext
 mutateEvolutionContext :: EvolutionContext -> IO EvolutionContext
 mutateEvolutionContext (EvolutionContext d s) = do m <- mutate d
                                                    return (EvolutionContext m s)
-
--- |Compare EvolutionContext by error
-instance Ord EvolutionContext where
-    compare x y
-        | error x == error y = EQ
-        | error x <= error y = LT
-        | otherwise          = GT

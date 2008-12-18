@@ -40,9 +40,9 @@ imageError :: (Num b,RGBColor Color b) => ColorMatrix -> ColorMatrix -> b
 imageError cm1 cm2 = sum $ zipWith colorError (concat cm1) (concat cm2)
 
 -- |Read an image from a file
-readImage :: Filename -> ColorMatrix
+readImage :: Filename -> IO ColorMatrix
 readImage = undefined
 
 -- |Render a drawing
-renderDrawing :: DnaDrawing -> ColorMatrix
+renderDrawing :: DnaDrawing -> IO ColorMatrix
 renderDrawing = undefined

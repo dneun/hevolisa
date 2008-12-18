@@ -53,4 +53,5 @@ addElem item index lst = left ++ [item] ++ right
 
 -- |Instances of Mutable can mutate their DNA
 class Mutable a where
+    -- |Perform a genetic mutation in a random way
     mutate :: a -> IO a

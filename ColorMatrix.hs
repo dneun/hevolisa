@@ -10,7 +10,7 @@ import DnaDrawing
 
 type Matrix a = [[a]]
 type ColorMatrix = Matrix Color
-data Color = Color (Double,Double,Double)
+data Color = Color (Double,Double,Double) deriving (Show,Eq)
 type Filename = String
 
 class RGBColor c where

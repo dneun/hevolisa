@@ -3,21 +3,25 @@ module Evolution where
 import Prelude hiding (error)
 import DnaDrawing
 import Tools
+import ColorMatrix ( ColorMatrix, imageError, renderDrawing )
 
-data EvolutionContext = EvolutionContext DnaDrawing SourceColorMatrix
+-- |Context contains the current drawing and the source image for comparison
+data EvolutionContext = EvolutionContext DnaDrawing ColorMatrix
                         deriving (Show,Eq)
-data SourceColorMatrix = SourceColorMatrix deriving (Show,Eq)
 
 generations = 10000
 
-initContext :: SourceColorMatrix -> IO EvolutionContext
+-- |Init the context with source image and initial drawing
+initContext :: ColorMatrix -> IO EvolutionContext
 initContext s = initDrawing >>= \d -> return (EvolutionContext d s)
 
+-- |Start the evolution process
 start s = mapseq (initContext s) (replicate generations step)
 
 -- |Smaller is better
 error :: EvolutionContext -> Double
-error = undefined
+error (EvolutionContext drawing source) = imageError mDrawing source
+    where mDrawing = renderDrawing drawing
 
 -- |EvolutionContext mutates minimizing the error
 instance Mutable EvolutionContext where

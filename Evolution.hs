@@ -30,7 +30,8 @@ instance Mutable EvolutionContext where
 
 -- |Single evolution step, minimize error
 step :: EvolutionContext -> IO EvolutionContext
-step ec = mutateEvolutionContext ec >>= \next -> return (min ec next)
+step ec = mutateEvolutionContext ec >>= \next -> 
+          return (min ec next)
 
 -- |Mutate the drawing in the EvolutionContext
 mutateEvolutionContext :: EvolutionContext -> IO EvolutionContext

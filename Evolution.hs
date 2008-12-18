@@ -16,9 +16,10 @@ initContext :: ColorMatrix -> IO EvolutionContext
 initContext s = initDrawing >>= \d -> return (EvolutionContext d s)
 
 -- |Start the evolution process
+start :: ColorMatrix -> IO EvolutionContext
 start s = mapseq (initContext s) (replicate generations step)
 
--- |Smaller is better
+-- |Color error, smaller is better
 error :: EvolutionContext -> Double
 error (EvolutionContext drawing source) = imageError renderedDrawing source
     where renderedDrawing = renderDrawing drawing

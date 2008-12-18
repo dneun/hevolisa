@@ -7,7 +7,7 @@ module ColorMatrix (
                     renderDrawing
                    ) where
 
-import DnaDrawing
+import DnaDrawing ( DnaDrawing )
 
 type Matrix a = [[a]]
 -- |Contains the color pixels of an image

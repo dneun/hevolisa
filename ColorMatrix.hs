@@ -9,10 +9,12 @@ module ColorMatrix (
 import DnaDrawing
 
 type Matrix a = [[a]]
+-- |Contains the color pixels of an image
 type ColorMatrix = Matrix Color
 data Color = Color (Double,Double,Double) deriving (Show,Eq)
 type Filename = String
 
+-- |General color class
 class RGBColor c where
     red   :: c -> Double
     green :: c -> Double
@@ -23,6 +25,7 @@ instance RGBColor Color where
     green (Color (_,g,_)) = g
     blue  (Color (_,_,b)) = b
 
+-- |Get the color error of two colors
 colorError :: (RGBColor a) => a -> a -> Double
 colorError c1 c2 = let deltaRed   = red c1 - red c2
                        deltaGreen = green c1 - green c2
@@ -31,6 +34,7 @@ colorError c1 c2 = let deltaRed   = red c1 - red c2
                       deltaGreen * deltaGreen +
                       deltaBlue * deltaBlue
 
+-- |Get the color error of two images
 imageError :: ColorMatrix -> ColorMatrix -> Double
 imageError cm1 cm2 = sum $ zipWith colorError (concat cm1) (concat cm2)
 

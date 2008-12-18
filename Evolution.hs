@@ -20,8 +20,8 @@ start s = mapseq (initContext s) (replicate generations step)
 
 -- |Smaller is better
 error :: EvolutionContext -> Double
-error (EvolutionContext drawing source) = imageError mDrawing source
-    where mDrawing = renderDrawing drawing
+error (EvolutionContext drawing source) = imageError renderedDrawing source
+    where renderedDrawing = renderDrawing drawing
 
 -- |EvolutionContext mutates minimizing the error
 instance Mutable EvolutionContext where

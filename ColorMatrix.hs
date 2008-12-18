@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -XMultiParamTypeClasses #-}
 module ColorMatrix (
                     ColorMatrix,
 
@@ -15,18 +16,18 @@ data Color = Color (Double,Double,Double) deriving (Show,Eq)
 type Filename = String
 
 -- |General color class
-class RGBColor c where
-    red   :: c -> Double
-    green :: c -> Double
-    blue  :: c -> Double
+class RGBColor c r where
+    red   :: c -> r
+    green :: c -> r
+    blue  :: c -> r
 
-instance RGBColor Color where
+instance RGBColor Color Double where
     red   (Color (r,_,_)) = r
     green (Color (_,g,_)) = g
     blue  (Color (_,_,b)) = b
 
 -- |Get the color error of two colors
-colorError :: (RGBColor a) => a -> a -> Double
+colorError :: (RGBColor a b,Num b) => a -> a -> b
 colorError c1 c2 = let deltaRed   = red c1 - red c2
                        deltaGreen = green c1 - green c2
                        deltaBlue  = blue c1 - blue c2

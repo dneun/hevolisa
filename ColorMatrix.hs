@@ -1,4 +1,4 @@
-{-# OPTIONS_GHC -XMultiParamTypeClasses #-}
+{-# OPTIONS_GHC -XMultiParamTypeClasses -XFlexibleContexts #-}
 module ColorMatrix (
                     ColorMatrix,
 
@@ -36,7 +36,7 @@ colorError c1 c2 = let deltaRed   = red c1 - red c2
                       deltaBlue * deltaBlue
 
 -- |Get the color error of two images
-imageError :: ColorMatrix -> ColorMatrix -> Double
+imageError :: (Num b,RGBColor Color b) => ColorMatrix -> ColorMatrix -> b
 imageError cm1 cm2 = sum $ zipWith colorError (concat cm1) (concat cm2)
 
 -- |Read an image from a file

@@ -59,4 +59,5 @@ class Mutable a where
     mutate :: a -> IO a
 
 class Points a where
+    -- |Count the points
     pointCount :: (Integral b) => a -> b

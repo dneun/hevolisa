@@ -96,4 +96,4 @@ removePolygon p = do index <- getRandomNumber 0 (length p - 1)
 movePolygon :: [DnaPolygon] -> IO [DnaPolygon]
 movePolygon p = do from <- getRandomNumber 0 (length p - 1)
                    to   <- getRandomNumber 0 (length p - 1)
-                   return (moveElemFromTo from to p)
+                   return (moveElem from to p)

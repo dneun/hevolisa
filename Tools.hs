@@ -6,7 +6,7 @@ module Tools (
               -- List index functions
               addElem,
               removeElem,
-              moveElemFromTo
+              moveElem
 ) where
 
 import Random
@@ -33,8 +33,10 @@ maybeMutate rate action unchanged = do mutate <- willMutate rate
                                        if mutate then action else return unchanged
 
 -- |Move a list element from index to index
-moveElemFromTo :: Int -> Int -> [a] -> [a]
-moveElemFromTo from to lst = addElem elem to $ removeElem from lst
+moveElem :: Int -- ^ From index
+         -> Int -- ^ To index
+         -> [a] -> [a]
+moveElem from to lst = addElem elem to $ removeElem from lst
     where elem = lst !! from
 
 

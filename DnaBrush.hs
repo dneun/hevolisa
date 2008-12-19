@@ -15,7 +15,7 @@ import Tools ( Mutable( mutate ), maybeMutate, getRandomNumber )
 -- |Brush to color polygons
 data DnaBrush = DnaBrush {
       red   :: Integer,
-      green ::  Integer,
+      green :: Integer,
       blue  :: Integer,
       alpha :: Integer 
 } deriving (Show,Eq,Read)

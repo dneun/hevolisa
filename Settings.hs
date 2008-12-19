@@ -18,9 +18,10 @@ activeMovePointMinMutationRate = 1500
 activeMovePointRangeMid = 20.0
 activeMovePointRangeMin = 3.0
 activeMovePolygonMutationRate = 700
+--activePointsMax = 1500
+--activePointsMin = 0
 activePointsPerPolygonMax = 10
 activePointsPerPolygonMin = 3
-
 activePolygonsMax = 255
 activePolygonsMin = 0
 activeRedMutationRate = 1500
@@ -28,6 +29,7 @@ activeRedRangeMax = 255
 activeRedRangeMin = 0
 activeRemovePointMutationRate = 1500
 activeRemovePolygonMutationRate = 1500
+--addPointMutationRate = 1500
 
 maxWidth = 200.0
 maxHeight = 200.0

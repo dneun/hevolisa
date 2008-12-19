@@ -50,7 +50,10 @@ instance Mutable DnaPolygon where
 
 -- |Mutate a polygon by adding and removing points and other funny tricks
 mutatePolygon :: DnaPolygon -> IO DnaPolygon
-mutatePolygon p = maybeAddPoint p >>= maybeRemovePoint >>= mutateBrushInP >>= mutatePoints
+mutatePolygon p = maybeAddPoint p >>= 
+                  maybeRemovePoint >>= 
+                  mutateBrush >>= 
+                  mutatePoints
 
 -- |Add a point if it`s time to do so
 maybeAddPoint :: DnaPolygon -> IO DnaPolygon
@@ -91,8 +94,8 @@ removePointAtRandomIndex p@(DnaPolygon b pts) = do index <- getRandomNumber 0 (p
                                                    return (DnaPolygon b (removePoint index pts))
 
 -- |Mutate the polygon brush
-mutateBrushInP :: DnaPolygon -> IO DnaPolygon
-mutateBrushInP (DnaPolygon brush pts) = mutate brush >>= \b -> return (DnaPolygon b pts)
+mutateBrush :: DnaPolygon -> IO DnaPolygon
+mutateBrush (DnaPolygon brush pts) = mutate brush >>= \b -> return (DnaPolygon b pts)
 
 -- |Mutate the polygon points
 mutatePoints :: DnaPolygon -> IO DnaPolygon

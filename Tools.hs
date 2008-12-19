@@ -1,6 +1,5 @@
 module Tools (
               Mutable (mutate),
-              willMutate,
               maybeMutate,
               getRandomNumber,
 

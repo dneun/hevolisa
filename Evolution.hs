@@ -6,8 +6,10 @@ import Tools
 import ColorMatrix ( ColorMatrix, imageError, renderDrawing )
 
 -- |Context contains the current drawing and the source image for comparison
-data EvolutionContext = EvolutionContext DnaDrawing ColorMatrix
-                        deriving (Show,Eq)
+data EvolutionContext = EvolutionContext {
+      drawing :: DnaDrawing,
+      source  :: ColorMatrix
+    }  deriving (Show,Eq)
 
 generations = 10000
 

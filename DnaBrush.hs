@@ -9,8 +9,13 @@ module DnaBrush (
 import Settings
 import Tools ( Mutable( mutate ), maybeMutate, getRandomNumber )
 
--- |Mutable brush (red green blue alpha)
-data DnaBrush = DnaBrush Integer Integer Integer Integer deriving (Show,Eq,Read)
+-- |Brush to color polygons
+data DnaBrush = DnaBrush {
+      red   :: Integer,
+      green ::  Integer,
+      blue  :: Integer,
+      alpha :: Integer 
+} deriving (Show,Eq,Read)
 
 -- |Brush is mutable
 instance Mutable DnaBrush where

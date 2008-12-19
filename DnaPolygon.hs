@@ -10,7 +10,7 @@ module DnaPolygon (
                   ) where
 
 import Settings
-import Tools ( Mutable( mutate ), getRandomNumber, maybeMutate )
+import Tools ( Mutable( mutate ), getRandomNumber, maybeMutate, removeElem )
 import DnaBrush ( DnaBrush, initBrush )
 import DnaPoint ( DnaPoint( DnaPoint ), initPoint, randomPoint, pointX, pointY )
 
@@ -77,9 +77,7 @@ addPoint index pts = left ++ [DnaPoint newX newY] ++ right
 
 -- |Remove a point from the polygon
 removePoint :: Int -> [DnaPoint] -> [DnaPoint]
-removePoint index pts = left ++ right
-    where left  = take index pts
-          right = drop (index + 1) pts
+removePoint = removeElem
 
 -- |Remove a point if it`s time to do so
 maybeRemovePoint :: DnaPolygon -> IO DnaPolygon

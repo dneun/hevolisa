@@ -12,19 +12,17 @@ import Tools
 import Settings
 
 -- |A drawing contains an ordered set of polygons
-data DnaDrawing = DnaDrawing [DnaPolygon] deriving (Show,Eq,Read)
-
--- |Get the polygons of a drawing
-drawingPolygons :: DnaDrawing -> [DnaPolygon]
-drawingPolygons (DnaDrawing pls) = pls
+data DnaDrawing = DnaDrawing {
+      polygons :: [DnaPolygon] 
+} deriving (Show,Eq,Read)
 
 -- |Get the number of polygons of a drawing to check constraints
 drawingPolygonsCount :: Integral a => DnaDrawing -> a
-drawingPolygonsCount = fromIntegral . length . drawingPolygons
+drawingPolygonsCount = fromIntegral . length . polygons
 
 -- |Get the sum of the points of the polygons to check constraints
 drawingPointCount :: DnaDrawing -> Integer
-drawingPointCount = sum . map polygonPointsCount . drawingPolygons
+drawingPointCount = sum . map polygonPointsCount . polygons
 
 -- |Sequences functions that produce actions
 mapseq :: Monad m => m a -> [a -> m a] -> m a

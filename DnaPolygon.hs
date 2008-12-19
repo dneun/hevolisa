@@ -2,8 +2,6 @@ module DnaPolygon (
                    DnaPolygon,
 
                    -- Accessors
-                   polygonBrush,
-                   polygonPoints,
                    polygonPointsCount,
 
                    -- Constructor, mutation

@@ -16,7 +16,7 @@ import DnaPoint ( DnaPoint( DnaPoint ), initPoint, randomPoint, pointX, pointY )
 
 -- |A polygon has a brush for color and a list of points
 data DnaPolygon = DnaPolygon {
-      brush :: DnaBrush, 
+      brush  :: DnaBrush, 
       points :: [DnaPoint] 
 } deriving (Show,Eq,Read)
 

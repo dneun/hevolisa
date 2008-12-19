@@ -1,5 +1,9 @@
 module DnaPolygon (
-                   DnaPolygon
+                   DnaPolygon,
+
+                   -- Accessors
+                   brush,
+                   points
                   ) where
 
 import Settings

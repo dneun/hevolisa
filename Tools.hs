@@ -58,6 +58,7 @@ class Mutable a where
     -- |Perform a genetic mutation in a random way
     mutate :: a -> IO a
 
+-- |Count the points
 class Points a where
     -- |Count the points
     pointCount :: (Integral b) => a -> b

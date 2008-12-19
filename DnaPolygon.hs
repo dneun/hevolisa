@@ -12,7 +12,7 @@ module DnaPolygon (
                   ) where
 
 import Settings
-import Tools ( Mutable( mutate ), getRandomNumber, willMutate )
+import Tools ( Mutable( mutate ), getRandomNumber, maybeMutate )
 import DnaBrush ( DnaBrush, initBrush )
 import DnaPoint ( DnaPoint( DnaPoint ), initPoint, randomPoint, pointX, pointY )
 
@@ -57,9 +57,10 @@ mutatePolygon p = maybeAddPoint p >>=
 
 -- |Add a point if it`s time to do so
 maybeAddPoint :: DnaPolygon -> IO DnaPolygon
-maybeAddPoint p = do mutate <- willMutate activeAddPointMutationRate
-                     if (mutate && polygonPointsCount p < activePointsPerPolygonMax) then 
-                         addPointAtRandomIndex p else return p
+maybeAddPoint p = maybeMutate activeAddPointMutationRate
+                  (if (polygonPointsCount p < activePointsPerPolygonMax) then
+                       addPointAtRandomIndex p else return p)
+                  p
 
 -- |Add a point at a random position between two points
 addPointAtRandomIndex :: DnaPolygon -> IO DnaPolygon
@@ -84,9 +85,10 @@ removePoint index pts = left ++ right
 
 -- |Remove a point if it`s time to do so
 maybeRemovePoint :: DnaPolygon -> IO DnaPolygon
-maybeRemovePoint p = do mutate <- willMutate activeRemovePointMutationRate
-                        if (mutate && polygonPointsCount p > activePointsPerPolygonMin) then
-                            removePointAtRandomIndex p else return p
+maybeRemovePoint p = maybeMutate activeRemovePointMutationRate
+                     (if (polygonPointsCount p > activePointsPerPolygonMin) then
+                          removePointAtRandomIndex p else return p)
+                     p
 
 -- |Remove a random point
 removePointAtRandomIndex :: DnaPolygon -> IO DnaPolygon

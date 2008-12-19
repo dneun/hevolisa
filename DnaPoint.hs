@@ -15,15 +15,10 @@ import Settings
 import Tools
 
 -- |Mutable Point
-data DnaPoint = DnaPoint Double Double deriving (Show,Eq,Read)
-
--- |X value of the point
-pointX :: DnaPoint -> Double
-pointX (DnaPoint x _) = x
-
--- |Y value of the point
-pointY :: DnaPoint -> Double
-pointY (DnaPoint _ y) = y
+data DnaPoint = DnaPoint {
+      pointX :: Double,
+      pointY :: Double 
+} deriving (Show,Eq,Read)
 
 -- |DnaPoint is mutable
 instance Mutable DnaPoint where

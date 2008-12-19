@@ -1,6 +1,9 @@
 module DnaBrush (
                  DnaBrush,
                          
+                 -- Accessors
+                 red, green, blue, alpha,
+
                  -- Constructors, mutate
                  initBrush,
                  mutateBrush

@@ -1,9 +1,4 @@
-module DnaBrush (
-                 DnaBrush,
-                         
-                 -- Accessors
-                 red, green, blue, alpha
-) where
+module DnaBrush ( DnaBrush ) where
 
 import Settings
 import Tools

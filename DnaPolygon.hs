@@ -15,19 +15,14 @@ import DnaBrush ( DnaBrush, initBrush )
 import DnaPoint ( DnaPoint( DnaPoint ), initPoint, randomPoint, pointX, pointY )
 
 -- |A polygon has a brush for color and a list of points
-data DnaPolygon = DnaPolygon DnaBrush [DnaPoint] deriving (Show,Eq,Read)
-
--- |Get the brush of the polygon
-polygonBrush :: DnaPolygon -> DnaBrush
-polygonBrush (DnaPolygon brush _) = brush
-
--- |Get the points of the polygon
-polygonPoints :: DnaPolygon -> [DnaPoint]
-polygonPoints (DnaPolygon _ points) = points
+data DnaPolygon = DnaPolygon {
+      brush :: DnaBrush, 
+      points :: [DnaPoint] 
+} deriving (Show,Eq,Read)
 
 -- |Count the points of the polygon
 polygonPointsCount :: Integral a => DnaPolygon -> a
-polygonPointsCount = fromIntegral . length . polygonPoints
+polygonPointsCount = fromIntegral . length . points
 
 -- |Initialize the polygon with random garbage
 initPolygon :: IO DnaPolygon

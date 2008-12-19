@@ -2,15 +2,11 @@ module DnaBrush (
                  DnaBrush,
                          
                  -- Accessors
-                 red, green, blue, alpha,
-
-                 -- Constructors, mutate
-                 initBrush,
-                 mutateBrush
+                 red, green, blue, alpha
 ) where
 
 import Settings
-import Tools ( Mutable( mutate ), maybeMutate, getRandomNumber )
+import Tools
 
 -- |Brush to color polygons
 data DnaBrush = DnaBrush {
@@ -25,12 +21,12 @@ instance Mutable DnaBrush where
     mutate = mutateBrush
 
 -- |Initialize brush with random garbage
-initBrush :: IO DnaBrush
-initBrush = do r <- getRandomNumber 0 255
-               g <- getRandomNumber 0 255
-               b <- getRandomNumber 0 255
-               a <- getRandomNumber 10 60
-               return (DnaBrush r g b a)
+instance RandomInit DnaBrush where
+    randomInit = do r <- getRandomNumber 0 255
+                    g <- getRandomNumber 0 255
+                    b <- getRandomNumber 0 255
+                    a <- getRandomNumber 10 60
+                    return (DnaBrush r g b a)
 
 -- |Change the brush values in a semi random way, rates can be adjusted
 mutateBrush :: DnaBrush -> IO DnaBrush

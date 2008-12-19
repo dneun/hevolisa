@@ -6,8 +6,6 @@ module DnaPoint (
                  pointY,
 
                  -- Constructors, mutate
-                 initPoint,
-                 mutatePoint,
                  randomPoint
                 ) where
 
@@ -25,15 +23,15 @@ instance Mutable DnaPoint where
     mutate = mutatePoint
 
 -- |Initialize point with random garbage
-initPoint :: IO DnaPoint
-initPoint = do x <- getRandomNumber 0.0 maxWidth
-               y <- getRandomNumber 0.0 maxHeight
-               return (DnaPoint x y)
+instance RandomInit DnaPoint where
+    randomInit = do x <- getRandomNumber 0.0 maxWidth
+                    y <- getRandomNumber 0.0 maxHeight
+                    return (DnaPoint x y)
 
 -- |Mutate points dna randomly, rates can be adjusted
 mutatePoint :: DnaPoint -> IO DnaPoint
 mutatePoint p = mutateMax p >>= mutateMid >>= mutateMin
-    where mutateMax   = maybeMutate activeMovePointMaxMutationRate initPoint
+    where mutateMax   = maybeMutate activeMovePointMaxMutationRate randomInit
           mutateMid p = maybeMutate activeMovePointMidMutationRate 
                         (pointFunction midX midY p) p
           mutateMin p = maybeMutate activeMovePointMinMutationRate 

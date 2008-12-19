@@ -13,7 +13,7 @@ generations = 10000
 
 -- |Init the context with source image and initial drawing
 initContext :: ColorMatrix -> IO EvolutionContext
-initContext s = initDrawing >>= \d -> return (EvolutionContext d s)
+initContext s = randomInit >>= return . flip EvolutionContext s
 
 -- |Start the evolution process
 start :: ColorMatrix -> IO EvolutionContext

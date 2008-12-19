@@ -1,15 +1,11 @@
 module DnaPolygon (
-                   DnaPolygon,
-
-                   -- Constructor, mutation
-                   initPolygon,
-                   mutatePolygon
+                   DnaPolygon
                   ) where
 
 import Settings
 import Tools
-import DnaBrush ( DnaBrush, initBrush )
-import DnaPoint ( DnaPoint( DnaPoint ), initPoint, randomPoint, pointX, pointY )
+import DnaBrush ( DnaBrush )
+import DnaPoint ( DnaPoint( DnaPoint ), randomPoint, pointX, pointY )
 
 -- |A polygon has a brush for color and a list of points
 data DnaPolygon = DnaPolygon {
@@ -21,15 +17,15 @@ instance Points DnaPolygon where
     pointCount = fromIntegral . length . points
 
 -- |Initialize the polygon with random garbage
-initPolygon :: IO DnaPolygon
-initPolygon = do points <- randomPoints activePointsPerPolygonMin
-                 brush <- initBrush
-                 return (DnaPolygon brush points)
+instance RandomInit DnaPolygon where
+    randomInit = do points <- randomPoints activePointsPerPolygonMin
+                    brush <- randomInit
+                    return (DnaPolygon brush points)
 
 -- |Create a list of random points
 randomPoints :: Integer       -- ^ Number of points
              -> IO [DnaPoint] -- ^ return the result
-randomPoints n = do origin <- initPoint
+randomPoints n = do origin <- randomInit
                     points <- sequence $ replicate (fromIntegral n) (randomPoint origin)
                     return points
 

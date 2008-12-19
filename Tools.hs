@@ -1,6 +1,8 @@
 module Tools (
               Mutable (mutate),
               Points (pointCount),
+              RandomInit (randomInit),
+
               maybeMutate,
               getRandomNumber,
 
@@ -62,3 +64,6 @@ class Mutable a where
 class Points a where
     -- |Count the points
     pointCount :: (Integral b) => a -> b
+
+class RandomInit a where
+    randomInit :: IO a

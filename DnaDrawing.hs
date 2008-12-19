@@ -1,13 +1,10 @@
 -- |Intended usage: @ initDrawing >>= mutate >>= mutate >>= mutate @
 module DnaDrawing (
                    DnaDrawing,
-
-                   -- Constructors
-                   initDrawing,
                    mapseq
 ) where
 
-import DnaPolygon ( DnaPolygon, initPolygon )
+import DnaPolygon ( DnaPolygon )
 import Tools
 import Settings
 
@@ -29,16 +26,15 @@ mapseq f []     = f
 mapseq s (f:fs) = mapseq (s >>= f) fs
 
 -- |Construct and init a new Drawing
-initDrawing :: IO DnaDrawing
-initDrawing = do polygons <- mseq $ replicate min addPolygon
-                 return (DnaDrawing polygons)
-                     where min = fromIntegral activePolygonsMin
-                           mseq = mapseq (return [])
+instance RandomInit DnaDrawing where
+    randomInit = mseq (replicate min addPolygon) >>= return . DnaDrawing
+        where min = fromIntegral activePolygonsMin
+              mseq = mapseq (return [])
 
 -- |Add a new polygon at a random position
 addPolygon :: [DnaPolygon] -> IO [DnaPolygon]
 addPolygon ps = do random <- getRandomNumber 0 (length ps)
-                   polygon <- initPolygon
+                   polygon <- randomInit
                    return (addElem polygon random ps)
 
 -- |Drawing has mutable DNA

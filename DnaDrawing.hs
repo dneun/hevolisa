@@ -17,12 +17,12 @@ data DnaDrawing = DnaDrawing {
 } deriving (Show,Eq,Read)
 
 -- |Get the number of polygons of a drawing to check constraints
-drawingPolygonsCount :: Integral a => DnaDrawing -> a
-drawingPolygonsCount = fromIntegral . length . polygons
+polygonsCount :: Integral a => DnaDrawing -> a
+polygonsCount = fromIntegral . length . polygons
 
 -- |Get the sum of the points of the polygons to check constraints
-drawingPointCount :: DnaDrawing -> Integer
-drawingPointCount = sum . map polygonPointsCount . polygons
+pointCount :: DnaDrawing -> Integer
+pointCount = sum . map polygonPointsCount . polygons
 
 -- |Sequences functions that produce actions
 mapseq :: Monad m => m a -> [a -> m a] -> m a
@@ -63,21 +63,21 @@ mutateDrawing d = maybeAddPolygon d >>=
 -- |Add a polygon if it`s time to do so and the constraints are met
 maybeAddPolygon :: DnaDrawing -> IO DnaDrawing
 maybeAddPolygon d = maybeMutate activeAddPolygonMutationRate
-                    (if (drawingPolygonsCount d < activePolygonsMax) then 
+                    (if (polygonsCount d < activePolygonsMax) then 
                          applyToPolygons addPolygon d else return d)
                     d
                     
 -- |Remove a polygon if it`s time to do so and the constraints are met
 maybeRemovePolygon :: DnaDrawing -> IO DnaDrawing
 maybeRemovePolygon d = maybeMutate activeRemovePolygonMutationRate
-                       (if (drawingPolygonsCount d > activePolygonsMin) then
+                       (if (polygonsCount d > activePolygonsMin) then
                             applyToPolygons removePolygon d else return d)
                        d
 
 -- |Move a polygon if it`s time to do so and the constraints are met
 maybeMovePolygon :: DnaDrawing -> IO DnaDrawing
 maybeMovePolygon d = maybeMutate activeMovePolygonMutationRate
-                     (if (drawingPolygonsCount d > 0) then
+                     (if (polygonsCount d > 0) then
                           applyToPolygons movePolygon d else return d)
                      d
 

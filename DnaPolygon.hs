@@ -1,16 +1,13 @@
 module DnaPolygon (
                    DnaPolygon,
 
-                   -- Accessors
-                   polygonPointsCount,
-
                    -- Constructor, mutation
                    initPolygon,
                    mutatePolygon
                   ) where
 
 import Settings
-import Tools ( Mutable( mutate ), getRandomNumber, maybeMutate, removeElem )
+import Tools
 import DnaBrush ( DnaBrush, initBrush )
 import DnaPoint ( DnaPoint( DnaPoint ), initPoint, randomPoint, pointX, pointY )
 
@@ -20,9 +17,8 @@ data DnaPolygon = DnaPolygon {
       points :: [DnaPoint] 
 } deriving (Show,Eq,Read)
 
--- |Count the points of the polygon
-polygonPointsCount :: Integral a => DnaPolygon -> a
-polygonPointsCount = fromIntegral . length . points
+instance Points DnaPolygon where
+    pointCount = fromIntegral . length . points
 
 -- |Initialize the polygon with random garbage
 initPolygon :: IO DnaPolygon
@@ -51,14 +47,14 @@ mutatePolygon p = maybeAddPoint p >>=
 -- |Add a point if it`s time to do so
 maybeAddPoint :: DnaPolygon -> IO DnaPolygon
 maybeAddPoint p = maybeMutate activeAddPointMutationRate
-                  (if (polygonPointsCount p < activePointsPerPolygonMax) then
+                  (if (pointCount p < activePointsPerPolygonMax) then
                        addPointAtRandomIndex p else return p)
                   p
 
 -- |Add a point at a random position between two points
 addPointAtRandomIndex :: DnaPolygon -> IO DnaPolygon
-addPointAtRandomIndex p@(DnaPolygon b pts) = do index <- getRandomNumber 1 (polygonPointsCount p - 1)
-                                                return (DnaPolygon b (addPoint index pts))
+addPointAtRandomIndex p = do index <- getRandomNumber 1 (pointCount p - 1)
+                             return (p { points = addPoint index (points p) })
 
 -- |Add a point at the given position
 addPoint :: Int -> [DnaPoint] -> [DnaPoint]
@@ -77,13 +73,13 @@ removePoint = removeElem
 -- |Remove a point if it`s time to do so
 maybeRemovePoint :: DnaPolygon -> IO DnaPolygon
 maybeRemovePoint p = maybeMutate activeRemovePointMutationRate
-                     (if (polygonPointsCount p > activePointsPerPolygonMin) then
+                     (if (pointCount p > activePointsPerPolygonMin) then
                           removePointAtRandomIndex p else return p)
                      p
 
 -- |Remove a random point
 removePointAtRandomIndex :: DnaPolygon -> IO DnaPolygon
-removePointAtRandomIndex p@(DnaPolygon b pts) = do index <- getRandomNumber 0 (polygonPointsCount p)
+removePointAtRandomIndex p@(DnaPolygon b pts) = do index <- getRandomNumber 0 (pointCount p)
                                                    return (DnaPolygon b (removePoint index pts))
 
 -- |Mutate the polygon brush

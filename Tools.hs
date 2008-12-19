@@ -1,5 +1,6 @@
 module Tools (
               Mutable (mutate),
+              Points (pointCount),
               maybeMutate,
               getRandomNumber,
 
@@ -56,3 +57,6 @@ addElem item index lst = left ++ [item] ++ right
 class Mutable a where
     -- |Perform a genetic mutation in a random way
     mutate :: a -> IO a
+
+class Points a where
+    pointCount :: (Integral b) => a -> b

@@ -7,7 +7,7 @@ module DnaDrawing (
                    mapseq
 ) where
 
-import DnaPolygon ( DnaPolygon, polygonPointsCount, initPolygon )
+import DnaPolygon ( DnaPolygon, initPolygon )
 import Tools
 import Settings
 
@@ -20,9 +20,8 @@ data DnaDrawing = DnaDrawing {
 polygonsCount :: Integral a => DnaDrawing -> a
 polygonsCount = fromIntegral . length . polygons
 
--- |Get the sum of the points of the polygons to check constraints
-pointCount :: DnaDrawing -> Integer
-pointCount = sum . map polygonPointsCount . polygons
+instance Points DnaDrawing where
+    pointCount = sum . map pointCount . polygons
 
 -- |Sequences functions that produce actions
 mapseq :: Monad m => m a -> [a -> m a] -> m a

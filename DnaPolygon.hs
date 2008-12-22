@@ -29,9 +29,7 @@ instance RandomInit DnaPolygon where
 -- |Create a list of random points
 randomPoints :: Integer       -- ^ Number of points
              -> IO [DnaPoint] -- ^ return the result
-randomPoints n = do origin <- randomInit
-                    points <- sequence $ replicate (fromIntegral n) (randomPoint origin)
-                    return points
+randomPoints n = randomInit >>= sequence . replicate (fromIntegral n) . randomPoint
 
 -- |A polygon has mutable DNA
 instance Mutable DnaPolygon where

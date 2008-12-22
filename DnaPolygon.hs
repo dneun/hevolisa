@@ -86,5 +86,5 @@ mutateBrush (DnaPolygon brush pts) = mutate brush >>= \b -> return (DnaPolygon b
 
 -- |Mutate the polygon points
 mutatePoints :: DnaPolygon -> IO DnaPolygon
-mutatePoints (DnaPolygon b pts) = do points <- sequence $ map mutate pts
-                                     return (DnaPolygon b points)
+mutatePoints p = (sequence . map mutate . points) p >>= 
+                 return . DnaPolygon (brush p)

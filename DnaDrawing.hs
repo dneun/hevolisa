@@ -1,4 +1,6 @@
-module DnaDrawing ( DnaDrawing ) where
+module DnaDrawing ( DnaDrawing,
+                    polygons
+) where
 
 import DnaPolygon ( DnaPolygon )
 import Tools

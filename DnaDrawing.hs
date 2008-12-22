@@ -45,7 +45,7 @@ instance Mutable DnaDrawing where
 applyToPolygons :: ([DnaPolygon] -> IO [DnaPolygon])
                 -> DnaDrawing
                 -> IO DnaDrawing
-applyToPolygons action d = action (polygons d) >>= return . DnaDrawing
+applyToPolygons f d = f (polygons d) >>= return . DnaDrawing
 
 -- |Basic drawing mutation function
 mutateDrawing :: DnaDrawing -> IO DnaDrawing

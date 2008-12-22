@@ -58,8 +58,8 @@ mutateDim :: Double    -- ^ Randomisation range
           -> Double    -- ^ Maximum
           -> Double    -- ^ Original value
           -> IO Double -- ^ New value (action)
-mutateDim range maxn n = do random <- getRandomNumber (-range) range
-                            return (min (max 0 (n + random)) maxn)
+mutateDim range maxn n = getRandomNumber (-range) range >>=
+                         return . min maxn . max 0 . (+ n)
 
 -- |Create a random point using another point
 randomPoint :: DnaPoint -> IO DnaPoint

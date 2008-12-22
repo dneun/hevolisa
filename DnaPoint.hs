@@ -42,9 +42,9 @@ pointFunction :: (Double -> IO Double) -- ^ Function to change the x value
               -> (Double -> IO Double) -- ^ Function to change the y value
               -> DnaPoint              -- ^ Original point
               -> IO DnaPoint           -- ^ Changed point (action)
-pointFunction xFunction yFunction p = do x <- xFunction $ pointX p
-                                         y <- yFunction $ pointY p
-                                         return (DnaPoint x y)
+pointFunction fx fy p = do x <- fx $ pointX p
+                           y <- fy $ pointY p
+                           return (DnaPoint x y)
 
 -- |Helper functions for different ranges
 midX, midY, minX, minY :: Double -> IO Double

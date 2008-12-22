@@ -1,8 +1,4 @@
--- |Intended usage: @ initDrawing >>= mutate >>= mutate >>= mutate @
-module DnaDrawing (
-                   DnaDrawing,
-                   mapseq
-) where
+module DnaDrawing ( DnaDrawing ) where
 
 import DnaPolygon ( DnaPolygon )
 import Tools
@@ -19,11 +15,6 @@ polygonsCount = fromIntegral . length . polygons
 
 instance Points DnaDrawing where
     pointCount = sum . map pointCount . polygons
-
--- |Sequences functions that produce actions
-mapseq :: Monad m => m a -> [a -> m a] -> m a
-mapseq f []     = f
-mapseq s (f:fs) = mapseq (s >>= f) fs
 
 -- |Construct and init a new Drawing
 instance RandomInit DnaDrawing where

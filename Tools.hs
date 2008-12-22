@@ -5,6 +5,7 @@ module Tools (
 
               maybeMutate,
               getRandomNumber,
+              mapseq,
 
               -- List index functions
               addElem,
@@ -67,3 +68,8 @@ class Points a where
 
 class RandomInit a where
     randomInit :: IO a
+
+-- |Sequences functions that produce actions
+mapseq :: Monad m => m a -> [a -> m a] -> m a
+mapseq f []     = f
+mapseq s (f:fs) = mapseq (s >>= f) fs

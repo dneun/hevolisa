@@ -15,6 +15,7 @@ data DnaDrawing = DnaDrawing {
 polygonsCount :: Integral a => DnaDrawing -> a
 polygonsCount = fromIntegral . length . polygons
 
+-- |Count the points in the drawing
 instance Points DnaDrawing where
     pointCount = sum . map pointCount . polygons
 

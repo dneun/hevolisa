@@ -8,17 +8,11 @@
 
 module Main where
 
-import DnaPoint
-import DnaBrush
-import DnaPolygon
 import DnaDrawing
-import Evolution
-import Tools
+import Tools (randomInit, mutate)
+
+generations = 10000
 
 main :: IO ()
-main = do (foldl (>>=) randomInit $ replicate 1000 mutate :: IO DnaDrawing) >>= putStrLn . show
-          (randomInit >>= mutate >>= mutate :: IO DnaPoint) >>= putStrLn . show
-          (randomInit >>= mutate >>= mutate :: IO DnaBrush) >>= putStrLn . show
-          (randomInit >>= mutate >>= mutate :: IO DnaPolygon) >>= putStrLn . show
-          (randomInit >>= mutate >>= mutate :: IO DnaDrawing) >>= putStrLn . show
-          
+main = (foldl (>>=) randomInit (replicate generations mutate) :: IO DnaDrawing) >>= 
+       putStrLn . show

@@ -35,14 +35,14 @@ instance RandomInit DnaPolygon where
                     brush <- randomInit
                     return (DnaPolygon brush points)
 
+-- |A polygon has mutable DNA
+instance Mutable DnaPolygon where
+    mutate = mutatePolygon
+
 -- |Create a list of random points
 randomPoints :: Integer       -- ^ Number of points
              -> IO [DnaPoint] -- ^ return the result
 randomPoints n = randomInit >>= sequence . replicate (fromIntegral n) . randomPoint
-
--- |A polygon has mutable DNA
-instance Mutable DnaPolygon where
-    mutate = mutatePolygon
 
 -- |Mutate a polygon by adding and removing points and other funny tricks
 mutatePolygon :: DnaPolygon -> IO DnaPolygon

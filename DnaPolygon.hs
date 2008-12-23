@@ -25,6 +25,7 @@ data DnaPolygon = DnaPolygon {
       points :: [DnaPoint] 
 } deriving (Show,Eq,Read)
 
+-- |Count the points of the polygon
 instance Points DnaPolygon where
     pointCount = fromIntegral . length . points
 

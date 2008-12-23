@@ -1,3 +1,11 @@
+--
+-- Module      : Tools
+-- Copyright   : (c) Daniel Neun 2008
+-- License     : BSD-style
+-- Maintainer  : daniel.neun@gmx.de
+-- Stability   : experimental
+-- Portability : portable
+
 module Tools (
               Mutable (mutate),
               Points (pointCount),

@@ -1,3 +1,11 @@
+--
+-- Module      : ColorMatrix
+-- Copyright   : (c) Daniel Neun 2008
+-- License     : BSD-style
+-- Maintainer  : daniel.neun@gmx.de
+-- Stability   : experimental
+-- Portability : portable
+
 {-# OPTIONS_GHC -XMultiParamTypeClasses -XFlexibleContexts #-}
 module ColorMatrix (
                     ColorMatrix,

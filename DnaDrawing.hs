@@ -1,3 +1,11 @@
+--
+-- Module      : DnaDrawing
+-- Copyright   : (c) Daniel Neun 2008
+-- License     : BSD-style
+-- Maintainer  : daniel.neun@gmx.de
+-- Stability   : experimental
+-- Portability : portable
+
 module DnaDrawing ( DnaDrawing,
                     polygons
 ) where

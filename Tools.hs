@@ -22,6 +22,19 @@ module Tools (
 
 import Random
 
+-- |Instances of Mutable can mutate their DNA
+class Mutable a where
+    -- |Perform a genetic mutation in a random way
+    mutate :: a -> IO a
+
+-- |Count the points
+class Points a where
+    -- |Count the points
+    pointCount :: (Integral b) => a -> b
+
+class RandomInit a where
+    randomInit :: IO a
+
 -- |Decide whether it`s time for a mutation
 willMutate :: Integer  -- ^ Mutation rate 
            -> IO Bool  -- ^ True: Mutate
@@ -62,16 +75,3 @@ addElem :: a -> Int -> [a] -> [a]
 addElem item index lst = left ++ [item] ++ right
     where left = take index lst
           right = drop index lst
-
--- |Instances of Mutable can mutate their DNA
-class Mutable a where
-    -- |Perform a genetic mutation in a random way
-    mutate :: a -> IO a
-
--- |Count the points
-class Points a where
-    -- |Count the points
-    pointCount :: (Integral b) => a -> b
-
-class RandomInit a where
-    randomInit :: IO a

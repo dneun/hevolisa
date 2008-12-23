@@ -31,7 +31,7 @@ instance Points DnaDrawing where
 instance RandomInit DnaDrawing where
     randomInit = mseq (replicate min addPolygon) >>= return . DnaDrawing
         where min = fromIntegral activePolygonsMin
-              mseq = mapseq (return [])
+              mseq = foldl (>>=) (return [])
 
 -- |Add a new polygon at a random position
 addPolygon :: [DnaPolygon] -> IO [DnaPolygon]

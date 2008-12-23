@@ -27,7 +27,7 @@ initContext s = randomInit >>= return . flip EvolutionContext s
 
 -- |Start the evolution process
 start :: ColorMatrix -> IO EvolutionContext
-start s = mapseq (initContext s) (replicate generations step)
+start s = foldl (>>=) (initContext s) (replicate generations step)
 
 -- |Color error, smaller is better
 error :: EvolutionContext -> IO Double

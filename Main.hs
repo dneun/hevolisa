@@ -14,5 +14,5 @@ import Tools (randomInit, mutate)
 generations = 10000
 
 main :: IO ()
-main = (foldl (>>=) randomInit (replicate generations mutate) :: IO DnaDrawing) >>= 
-       putStrLn . show
+main = let lst = replicate generations mutate
+       in (foldl (>>=) randomInit lst :: IO DnaDrawing) >>= putStrLn . show

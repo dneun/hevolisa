@@ -11,3 +11,7 @@ The evolution and mutation part is almost finished. Right now I`m
 trying to build gtk2hs to get the cairo haskell bindings working. I`m still
 having problems building gtk+ 2.8.9. I need the cairo bindings to do the
 rendering of polygons and to load the source image.
+
+Update: I managed to build and install Cairo/GTK after two days of
+tedious tweaking of makefiles, library paths and compiler options. I
+hope that I can implement the polygon rendering during the next days.

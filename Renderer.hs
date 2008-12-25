@@ -65,3 +65,7 @@ renderBrush br = C.setSourceRGBA r g b a
 renderLine :: DnaPoint -> DnaPoint -> C.Render DnaPoint
 renderLine (DnaPoint x1 y1) (DnaPoint x2 y2) = do C.lineTo x2 y2
                                                   return (DnaPoint x2 y2)
+
+
+error :: C.Surface -> C.Surface -> IO Double
+error = undefined

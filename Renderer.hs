@@ -50,7 +50,7 @@ renderPolygons d = sequence $ map renderPolygon (polygons d)
 
 renderPolygon :: DnaPolygon -> C.Render ()
 renderPolygon p = do renderBrush $ brush p
-                     foldM_ renderLine (last $ points p) (points p)
+                     sequence $ map (\(DnaPoint x y) -> C.lineTo x y) (points p)
                      C.fill
 
 renderBrush :: DnaBrush -> C.Render ()
@@ -59,12 +59,7 @@ renderBrush br = C.setSourceRGBA r g b a
           g = normalize green br
           b = normalize blue br
           a = normalize alpha br
-          normalize c = (/255) . fromIntegral . c
-
-
-renderLine :: DnaPoint -> DnaPoint -> C.Render DnaPoint
-renderLine (DnaPoint x1 y1) (DnaPoint x2 y2) = do C.lineTo x2 y2
-                                                  return (DnaPoint x2 y2)
+          normalize f = (/255) . fromIntegral . f
 
 
 error :: C.Surface -> C.Surface -> IO Double

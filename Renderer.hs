@@ -27,32 +27,39 @@ display d = do
   -- press any key to quit
   G.onKeyPress window $ const (do G.widgetDestroy window; return True)
   G.onDestroy window G.mainQuit
-  G.onExpose canvas $ const $ render d canvas
+  surface <- render d
+  G.onExpose canvas $ const $ do drawWin <- G.widgetGetDrawWindow canvas
+                                 G.renderWithDrawable drawWin $ do
+                                   C.setSourceSurface surface 0 0
+                                   C.paint
+                                   return True
   G.set window [G.containerChild G.:= canvas]
   G.widgetShowAll window
   G.mainGUI
 
-render :: DnaDrawing -> G.DrawingArea -> IO Bool
-render d canvas = do
-  win <- G.widgetGetDrawWindow canvas
-  (width, height) <- G.widgetGetSize canvas
-  G.renderWithDrawable win $ renderPolygons d
-  return True
+render :: DnaDrawing -> IO C.Surface
+render d = do
+  let width  = (truncate S.maxWidth)
+      height = (truncate S.maxHeight)
+  surface <- C.createImageSurface C.FormatARGB32 width height
+  C.renderWith surface $ renderPolygons d
+  return surface
 
 renderPolygons :: DnaDrawing -> C.Render [()]
 renderPolygons d = sequence $ map renderPolygon (polygons d)
 
 renderPolygon :: DnaPolygon -> C.Render ()
-renderPolygon p = do renderBrush p
+renderPolygon p = do renderBrush $ brush p
                      foldM_ renderLine (last $ points p) (points p)
                      C.fill
 
-renderBrush p = C.setSourceRGBA r g b a
-    where r = normalize red p
-          g = normalize green p
-          b = normalize blue p
-          a = normalize alpha p
-          normalize c = (/255) . fromIntegral . c . brush
+renderBrush :: DnaBrush -> C.Render ()
+renderBrush br = C.setSourceRGBA r g b a
+    where r = normalize red br
+          g = normalize green br
+          b = normalize blue br
+          a = normalize alpha br
+          normalize c = (/255) . fromIntegral . c
 
 
 renderLine :: DnaPoint -> DnaPoint -> C.Render DnaPoint

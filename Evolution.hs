@@ -8,31 +8,35 @@
 
 module Evolution where
 
+import Data.Word
 import Prelude hiding (error)
 import DnaDrawing
 import Tools
 import ColorMatrix ( ColorMatrix, imageError, renderDrawing )
+import Renderer ( drawingError )
 
 -- |Context contains the current drawing and the source image for comparison
 data EvolutionContext = EvolutionContext {
       drawing :: DnaDrawing,
-      source  :: ColorMatrix
+      source  :: String
     }  deriving (Show,Eq)
 
 generations = 10000
 
 -- |Init the context with source image and initial drawing
-initContext :: ColorMatrix -> IO EvolutionContext
+initContext :: String -> IO EvolutionContext
 initContext s = randomInit >>= return . flip EvolutionContext s
 
 -- |Start the evolution process
-start :: ColorMatrix -> IO EvolutionContext
+start :: String -> IO EvolutionContext
 start s = foldl (>>=) (initContext s) (replicate generations step)
 
 -- |Color error, smaller is better
-error :: EvolutionContext -> IO Double
-error (EvolutionContext drawing source) = renderDrawing drawing >>= \d ->
-                                          return (imageError d source)
+-- error :: EvolutionContext -> IO Double
+-- error (EvolutionContext drawing source) = renderDrawing drawing >>= \d ->
+--                                           return (imageError d source)
+error :: EvolutionContext -> IO (Maybe Word8)
+error (EvolutionContext drawing source) = drawingError drawing source
 
 -- |EvolutionContext mutates minimizing the error
 instance Mutable EvolutionContext where

@@ -126,7 +126,7 @@ colorError c1 c2 = let deltaRed   = red c1 - red c2
    
 fileToPixbuf :: FilePath -> IO (Maybe Pixbuf)
 fileToPixbuf fp = C.withImageSurfaceFromPNG fp $ \surface ->
-                  do pixmap <- P.pixmapNew (Nothing :: Maybe Drawable) width height (Just 8)
+                  do pixmap <- P.pixmapNew (Nothing :: Maybe DrawWindow) width height (Just 8)
                      G.renderWithDrawable pixmap $ do C.setSourceSurface surface 0 0
                                                       C.paint
                      pixbufGetFromDrawable pixmap (Rectangle 0 0 width height)

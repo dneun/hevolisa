@@ -104,7 +104,7 @@ colors p = do pix <- pixbufGetPixels p :: IO (G.PixbufData Int Word8)
               return $ toColors els
 
 toColors :: [a] -> [Color a]
-toDolors []           = []
+toColors []           = []
 toColors (r:g:b:a:xs) = Color r g b a : toColors xs
 toColors _            = Prelude.error "wrong number of arguments"
        

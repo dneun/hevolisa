@@ -86,9 +86,9 @@ drawingError d path = do
   imagePixbuf <- fileToPixbuf path
   case drawingPixbuf of    
     Nothing -> return Nothing
-    Just pixbuf -> case imagePixbuf of
+    Just drawing -> case imagePixbuf of
                      Nothing -> return Nothing
-                     Just image -> do error <- Renderer.error pixbuf image
+                     Just image -> do error <- Renderer.error drawing image
                                       return $ Just error
   
 error :: Pixbuf -> Pixbuf -> IO Word8

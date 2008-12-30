@@ -62,8 +62,8 @@ renderToPixbuf d = do
   pixbuf <- pixbufGetFromDrawable pixmap (Rectangle 0 0 width height)
   return pixbuf
 
-renderPolygons :: DnaDrawing -> C.Render [()]
-renderPolygons d = sequence $ map renderPolygon (polygons d)
+renderPolygons :: DnaDrawing -> C.Render ()
+renderPolygons d = sequence_ $ map renderPolygon (polygons d)
 
 renderPolygon :: DnaPolygon -> C.Render ()
 renderPolygon p = do renderBrush $ brush p

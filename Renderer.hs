@@ -10,6 +10,7 @@ module Renderer (drawingError) where
 
 import Data.Word
 import Data.Array.MArray
+import qualified Data.Traversable as T
 import Foreign.Storable
 import qualified Graphics.UI.Gtk as G
 import qualified Graphics.Rendering.Cairo as C
@@ -84,12 +85,9 @@ drawingError :: DnaDrawing -> String -> IO (Maybe Word8)
 drawingError d path = do
   drawingPixbuf <- renderToPixbuf d
   imagePixbuf <- fileToPixbuf path
-  case drawingPixbuf of    
-    Nothing -> return Nothing
-    Just drawing -> case imagePixbuf of
-                     Nothing -> return Nothing
-                     Just image -> do error <- Renderer.error drawing image
-                                      return $ Just error
+  T.sequence $ do drawing <- drawingPixbuf
+                  image <- imagePixbuf
+                  return $ Renderer.error drawing image
   
 error :: Pixbuf -> Pixbuf -> IO Word8
 error p1 p2 = do

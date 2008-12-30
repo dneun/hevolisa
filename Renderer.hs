@@ -24,7 +24,6 @@ import qualified DnaBrush as B
 import DnaPoint
 import qualified Settings as S
 import ColorMatrix
-import Debug.Trace
 
 
 -- display :: DnaDrawing -> IO ()
@@ -90,7 +89,7 @@ drawingError d path = do
     Just pixbuf -> case imagePixbuf of
                      Nothing -> return Nothing
                      Just image -> do error <- Renderer.error pixbuf image
-                                      trace "foo" $ return $ Just error
+                                      return $ Just error
   
 error :: Pixbuf -> Pixbuf -> IO Word8
 error p1 p2 = do

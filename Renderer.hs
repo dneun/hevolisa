@@ -54,13 +54,25 @@ import ColorMatrix
 --   C.renderWith surface $ renderPolygons d
 --   return surface
 
-renderToPixbuf :: DnaDrawing -> IO (Maybe Pixbuf)
-renderToPixbuf d = do
+renderToPixbuf :: C.Render () -> IO (Maybe Pixbuf)
+renderToPixbuf render = do
   G.initGUI
-  pixmap <- P.pixmapNew (Nothing :: Maybe DrawWindow) width height (Just 8)
-  G.renderWithDrawable pixmap (renderPolygons d)
-  pixbuf <- pixbufGetFromDrawable pixmap (Rectangle 0 0 width height)
+  window <- G.windowNew
+  canvas <- G.drawingAreaNew
+  G.set window [G.containerChild G.:= canvas]
+  G.widgetShowAll window
+  G.flush
+  pixbuf <- updateCanvas canvas render
+  G.widgetDestroy window
   return pixbuf
+
+  where updateCanvas :: G.DrawingArea -> C.Render () -> IO (Maybe Pixbuf)
+        updateCanvas canvas act = do
+                     win <- widgetGetDrawWindow canvas
+                     G.renderWithDrawable win act
+                     pixmap <- P.pixmapNew (Just win) width height Nothing
+                     pixbuf <- pixbufGetFromDrawable pixmap (Rectangle 0 0 width height)
+                     return pixbuf
 
 renderPolygons :: DnaDrawing -> C.Render ()
 renderPolygons d = sequence_ $ map renderPolygon (polygons d)
@@ -83,7 +95,7 @@ width  = truncate S.maxWidth  :: Int
 
 drawingError :: DnaDrawing -> String -> IO (Maybe Word8)
 drawingError d path = do
-  drawingPixbuf <- renderToPixbuf d
+  drawingPixbuf <- renderToPixbuf (renderPolygons d)
   imagePixbuf <- fileToPixbuf path
   T.sequence $ do drawing <- drawingPixbuf
                   image <- imagePixbuf
@@ -122,8 +134,8 @@ colorError c1 c2 = let deltaRed   = red c1 - red c2
                       deltaBlue * deltaBlue
    
 fileToPixbuf :: FilePath -> IO (Maybe Pixbuf)
-fileToPixbuf fp = C.withImageSurfaceFromPNG fp $ \surface ->
-                  do pixmap <- P.pixmapNew (Nothing :: Maybe DrawWindow) width height (Just 8)
-                     G.renderWithDrawable pixmap $ do C.setSourceSurface surface 0 0
-                                                      C.paint
-                     pixbufGetFromDrawable pixmap (Rectangle 0 0 width height)
+fileToPixbuf fp = C.withImageSurfaceFromPNG fp $ renderToPixbuf . renderSurface
+
+renderSurface :: C.Surface -> C.Render ()
+renderSurface s = do C.setSourceSurface s 0 0
+                     C.paint

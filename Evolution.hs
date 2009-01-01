@@ -14,6 +14,7 @@ import DnaDrawing
 import Tools
 import ColorMatrix ( ColorMatrix, imageError, renderDrawing )
 import Renderer ( drawingError )
+import Debug.Trace
 
 -- |Context contains the current drawing and the source image for comparison
 data EvolutionContext = EvolutionContext {
@@ -47,7 +48,7 @@ step :: EvolutionContext -> IO EvolutionContext
 step ec = do next <- mutateEvolutionContext ec
              e1 <- error ec
              e2 <- error next
-             if e1 < e2 then return ec else return next
+             if e1 < e2 then trace (show e1) return ec else trace (show e2) return next
 
 -- |Mutate the drawing in the EvolutionContext
 mutateEvolutionContext :: EvolutionContext -> IO EvolutionContext

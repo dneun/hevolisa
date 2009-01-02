@@ -19,9 +19,6 @@ data DnaDrawing = DnaDrawing {
       polygons :: [DnaPolygon] 
 } deriving (Show,Eq,Read)
 
--- |Get the number of polygons of a drawing to check constraints
-polygonsCount :: Integral a => DnaDrawing -> a
-polygonsCount = fromIntegral . length . polygons
 
 -- |Count the points in the drawing
 instance Points DnaDrawing where
@@ -43,11 +40,6 @@ addPolygon ps = do random <- getRandomNumber 0 (length ps)
 instance Mutable DnaDrawing where
     mutate = mutateDrawing
 
--- |Apply a polygon function to a drawing
-applyToPolygons :: ([DnaPolygon] -> IO [DnaPolygon])
-                -> DnaDrawing
-                -> IO DnaDrawing
-applyToPolygons f d = f (polygons d) >>= return . DnaDrawing
 
 -- |Basic drawing mutation function
 mutateDrawing :: DnaDrawing -> IO DnaDrawing
@@ -55,39 +47,49 @@ mutateDrawing d = maybeAddPolygon d >>=
                   maybeRemovePolygon >>= 
                   maybeMovePolygon >>= 
                   mutatePolygons
-
--- |Add a polygon if it`s time to do so and the constraints are met
-maybeAddPolygon :: DnaDrawing -> IO DnaDrawing
-maybeAddPolygon d = maybeMutate activeAddPolygonMutationRate
-                    (if (polygonsCount d < activePolygonsMax) then 
-                         applyToPolygons addPolygon d else return d)
-                    d
+    where
+      -- |Add a polygon if it`s time to do so and the constraints are met
+      maybeAddPolygon :: DnaDrawing -> IO DnaDrawing
+      maybeAddPolygon d = maybeMutate activeAddPolygonMutationRate
+                          (if (polygonsCount d < activePolygonsMax) then 
+                               applyToPolygons addPolygon d else return d)
+                          d
                     
--- |Remove a polygon if it`s time to do so and the constraints are met
-maybeRemovePolygon :: DnaDrawing -> IO DnaDrawing
-maybeRemovePolygon d = maybeMutate activeRemovePolygonMutationRate
-                       (if (polygonsCount d > activePolygonsMin) then
-                            applyToPolygons removePolygon d else return d)
-                       d
+      -- |Remove a polygon if it`s time to do so and the constraints are met
+      maybeRemovePolygon :: DnaDrawing -> IO DnaDrawing
+      maybeRemovePolygon d = maybeMutate activeRemovePolygonMutationRate
+                             (if (polygonsCount d > activePolygonsMin) then
+                                  applyToPolygons removePolygon d else return d)
+                             d
 
--- |Move a polygon if it`s time to do so and the constraints are met
-maybeMovePolygon :: DnaDrawing -> IO DnaDrawing
-maybeMovePolygon d = maybeMutate activeMovePolygonMutationRate
-                     (if (polygonsCount d > 0) then
-                          applyToPolygons movePolygon d else return d)
-                     d
+      -- |Remove a polygon at a random index
+      removePolygon :: [DnaPolygon] -> IO [DnaPolygon]
+      removePolygon p = do index <- getRandomNumber 0 (length p - 1)
+                           return (removeElem index p)
 
--- |Mutate polygons if it`s time to do so and the constraints are met
-mutatePolygons :: DnaDrawing -> IO DnaDrawing
-mutatePolygons = applyToPolygons (mapM mutate)
+      -- |Move a polygon if it`s time to do so and the constraints are met
+      maybeMovePolygon :: DnaDrawing -> IO DnaDrawing
+      maybeMovePolygon d = maybeMutate activeMovePolygonMutationRate
+                           (if (polygonsCount d > 0) then
+                                applyToPolygons movePolygon d else return d)
+                           d
 
--- |Remove a polygon at a random index
-removePolygon :: [DnaPolygon] -> IO [DnaPolygon]
-removePolygon p = do index <- getRandomNumber 0 (length p - 1)
-                     return (removeElem index p)
-                     
--- |Move a polygon in the list of polygons
-movePolygon :: [DnaPolygon] -> IO [DnaPolygon]
-movePolygon p = do from <- getRandomNumber 0 (length p - 1)
-                   to   <- getRandomNumber 0 (length p - 1)
-                   return (moveElem from to p)
+      -- |Move a polygon in the list of polygons
+      movePolygon :: [DnaPolygon] -> IO [DnaPolygon]
+      movePolygon p = do from <- getRandomNumber 0 (length p - 1)
+                         to   <- getRandomNumber 0 (length p - 1)
+                         return (moveElem from to p)
+
+      -- |Mutate polygons if it`s time to do so and the constraints are met
+      mutatePolygons :: DnaDrawing -> IO DnaDrawing
+      mutatePolygons = applyToPolygons (mapM mutate)
+
+      -- |Apply a polygon function to a drawing
+      applyToPolygons :: ([DnaPolygon] -> IO [DnaPolygon])
+                      -> DnaDrawing
+                      -> IO DnaDrawing
+      applyToPolygons f d = f (polygons d) >>= return . DnaDrawing
+
+      -- |Get the number of polygons of a drawing to check constraints
+      polygonsCount :: Integral a => DnaDrawing -> a
+      polygonsCount = fromIntegral . length . polygons

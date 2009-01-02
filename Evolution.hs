@@ -12,7 +12,6 @@ import Data.Word
 import Prelude hiding (error)
 import DnaDrawing
 import Tools
-import ColorMatrix ( ColorMatrix, imageError, renderDrawing )
 import Renderer ( drawingError )
 import Debug.Trace
 

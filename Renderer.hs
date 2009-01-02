@@ -31,29 +31,6 @@ data Color a = Color {
       alpha :: a
 }
 
--- | Rasterisation: FIXME
-renderToPixbuf :: C.Render () -> IO (Maybe Pixbuf)
-renderToPixbuf render = do
-  G.initGUI
-  window <- G.windowNew
-  canvas <- G.drawingAreaNew
-  G.set window [G.containerChild G.:= canvas]
-  G.widgetShowAll window
-  G.flush
-  pixbuf <- updateCanvas canvas render
-  G.widgetDestroy window
-  return pixbuf
-
-  where updateCanvas :: G.DrawingArea -> C.Render () -> IO (Maybe Pixbuf)
-        updateCanvas canvas act = do
-                     win <- widgetGetDrawWindow canvas
-                     G.renderWithDrawable win act
-                     pixmap <- P.pixmapNew (Just win) width height Nothing
-                     pixbuf <- pixbufGetFromDrawable pixmap (Rectangle 0 0 width height)
-                     return pixbuf
-        height = truncate S.maxHeight :: Int
-        width  = truncate S.maxWidth  :: Int
-
 class Renderable a where
     render :: a -> C.Render ()
 
@@ -73,6 +50,7 @@ instance Renderable B.DnaBrush where
 
 instance Renderable DnaDrawing where
     render = sequence_ . map render . polygons
+
 
 -- | 1. Rasterize the drawing
 --
@@ -114,3 +92,27 @@ drawingError d path = do
 
         renderSurface :: C.Surface -> C.Render ()
         renderSurface s = C.setSourceSurface s 0 0 >> C.paint
+
+
+-- | Rasterisation: FIXME
+renderToPixbuf :: C.Render () -> IO (Maybe Pixbuf)
+renderToPixbuf render = do
+  G.initGUI
+  window <- G.windowNew
+  canvas <- G.drawingAreaNew
+  G.set window [G.containerChild G.:= canvas]
+  G.widgetShowAll window
+  G.flush
+  pixbuf <- updateCanvas canvas render
+  G.widgetDestroy window
+  return pixbuf
+
+  where updateCanvas :: G.DrawingArea -> C.Render () -> IO (Maybe Pixbuf)
+        updateCanvas canvas act = do
+                     win <- widgetGetDrawWindow canvas
+                     G.renderWithDrawable win act
+                     pixmap <- P.pixmapNew (Just win) width height Nothing
+                     pixbuf <- pixbufGetFromDrawable pixmap (Rectangle 0 0 width height)
+                     return pixbuf
+        height = truncate S.maxHeight :: Int
+        width  = truncate S.maxWidth  :: Int

@@ -34,10 +34,13 @@ data Color a = Color {
 class Renderable a where
     render :: a -> C.Render ()
 
+instance Renderable DnaPoint where
+    render (DnaPoint x y) = C.lineTo x y
+
 instance Renderable DnaPolygon where
     render p = do
       render (brush p)
-      sequence $ map (\(DnaPoint x y) -> C.lineTo x y) (points p)
+      sequence $ map render $ points p
       C.fill
 
 instance Renderable B.DnaBrush where

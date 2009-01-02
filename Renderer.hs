@@ -12,47 +12,17 @@ import Control.Monad
 import Data.Word
 import Data.Array.MArray
 import qualified Data.Traversable as T
-import Foreign.Storable
 import qualified Graphics.UI.Gtk as G
 import qualified Graphics.Rendering.Cairo as C
 import qualified Graphics.UI.Gtk.Gdk.Pixmap as P
-import Graphics.UI.Gtk.Gdk.DrawWindow
 import Graphics.UI.Gtk.Gdk.Pixbuf
 import Graphics.UI.Gtk.General.Structs hiding (Color)
-import Graphics.UI.Gtk.Gdk.Drawable
 import DnaDrawing
 import DnaPolygon
 import qualified DnaBrush as B
 import DnaPoint
 import qualified Settings as S
 
-
--- display :: DnaDrawing -> IO ()
--- display d = do
---   G.initGUI
---   window <- G.windowNew
---   canvas <- G.drawingAreaNew
---   G.widgetSetSizeRequest window (truncate S.maxWidth) (truncate S.maxHeight)
---   -- press any key to quit
---   G.onKeyPress window $ const (do G.widgetDestroy window; return True)
---   G.onDestroy window G.mainQuit
---   surface <- render d
---   G.onExpose canvas $ const $ do drawWin <- G.widgetGetDrawWindow canvas
---                                  G.renderWithDrawable drawWin $ do
---                                    C.setSourceSurface surface 0 0
---                                    C.paint
---                                    return True
---   G.set window [G.containerChild G.:= canvas]
---   G.widgetShowAll window
---   G.mainGUI
-
--- render :: DnaDrawing -> IO C.Surface
--- render d = do
---   let width  = (truncate S.maxWidth)
---       height = (truncate S.maxHeight)
---   surface <- C.createImageSurface C.FormatARGB32 width height
---   C.renderWith surface $ renderPolygons d
---   return surface
 
 data Color a = Color {
       red   :: a,
@@ -99,7 +69,6 @@ renderDrawing = sequence_ . map renderPolygon . polygons
                 b = normalize B.blue br
                 a = normalize B.alpha br
                 normalize f = (/255) . fromIntegral . f
-
 
 
 drawingError :: DnaDrawing -> FilePath -> IO (Maybe Word8)

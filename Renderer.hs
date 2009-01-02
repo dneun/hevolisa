@@ -25,7 +25,6 @@ import DnaPolygon
 import qualified DnaBrush as B
 import DnaPoint
 import qualified Settings as S
-import ColorMatrix
 
 
 -- display :: DnaDrawing -> IO ()
@@ -84,8 +83,8 @@ renderToPixbuf render = do
         height = truncate S.maxHeight :: Int
         width  = truncate S.maxWidth  :: Int
 
-renderPolygons :: DnaDrawing -> C.Render ()
-renderPolygons = sequence_ . map renderPolygon . polygons
+renderDrawing :: DnaDrawing -> C.Render ()
+renderDrawing = sequence_ . map renderPolygon . polygons
     where
       renderPolygon :: DnaPolygon -> C.Render ()
       renderPolygon p = do
@@ -105,7 +104,7 @@ renderPolygons = sequence_ . map renderPolygon . polygons
 
 drawingError :: DnaDrawing -> String -> IO (Maybe Word8)
 drawingError d path = do
-  drawingPixbuf <- renderToPixbuf (renderPolygons d)
+  drawingPixbuf <- renderToPixbuf (renderDrawing d)
   imagePixbuf <- fileToPixbuf path
   T.sequence $ liftM2 error drawingPixbuf imagePixbuf
       where

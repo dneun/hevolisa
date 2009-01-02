@@ -45,21 +45,21 @@ mutatePoint p = mutateMax p >>= mutateMid >>= mutateMin
           mutateMin p = maybeMutate activeMovePointMinMutationRate 
                         (pointFunction minX minY p) p
 
--- |Change the x and y values of the point with functions
-pointFunction :: (Double -> IO Double) -- ^ Function to change the x value
-              -> (Double -> IO Double) -- ^ Function to change the y value
-              -> DnaPoint              -- ^ Original point
-              -> IO DnaPoint           -- ^ Changed point (action)
-pointFunction fx fy p = do x <- fx $ pointX p
-                           y <- fy $ pointY p
-                           return (DnaPoint x y)
+          -- |Change the x and y values of the point with functions
+          pointFunction :: (Double -> IO Double) -- ^ Function to change the x value
+                        -> (Double -> IO Double) -- ^ Function to change the y value
+                        -> DnaPoint              -- ^ Original point
+                        -> IO DnaPoint           -- ^ Changed point (action)
+          pointFunction fx fy p = do x <- fx $ pointX p
+                                     y <- fy $ pointY p
+                                     return (DnaPoint x y)
 
--- |Helper functions for different ranges
-midX, midY, minX, minY :: Double -> IO Double
-midX = mutateDim activeMovePointRangeMid maxWidth
-midY = mutateDim activeMovePointRangeMid maxHeight
-minX = mutateDim activeMovePointRangeMin maxWidth
-minY = mutateDim activeMovePointRangeMin maxHeight
+          -- |Helper functions for different ranges
+          midX, midY, minX, minY :: Double -> IO Double
+          midX = mutateDim activeMovePointRangeMid maxWidth
+          midY = mutateDim activeMovePointRangeMid maxHeight
+          minX = mutateDim activeMovePointRangeMin maxWidth
+          minY = mutateDim activeMovePointRangeMin maxHeight
 
 -- |Mutate a one-dimensional value
 mutateDim :: Double    -- ^ Randomisation range

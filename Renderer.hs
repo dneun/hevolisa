@@ -102,7 +102,7 @@ renderDrawing = sequence_ . map renderPolygon . polygons
 
 
 
-drawingError :: DnaDrawing -> String -> IO (Maybe Word8)
+drawingError :: DnaDrawing -> FilePath -> IO (Maybe Word8)
 drawingError d path = do
   drawingPixbuf <- renderToPixbuf (renderDrawing d)
   imagePixbuf <- fileToPixbuf path

@@ -39,8 +39,8 @@ instance Renderable DnaPoint where
 
 instance Renderable DnaPolygon where
     render p = do
-      render (brush p)
-      sequence $ map render $ points p
+      render $ brush p
+      render $ points p
       C.fill
 
 instance Renderable B.DnaBrush where
@@ -52,7 +52,10 @@ instance Renderable B.DnaBrush where
               normalize f = (/255) . fromIntegral . f
 
 instance Renderable DnaDrawing where
-    render = sequence_ . map render . polygons
+    render = render . polygons
+
+instance (Renderable a) => Renderable [a] where
+    render = sequence_ . map render
 
 
 -- | 1. Rasterize the drawing

@@ -8,6 +8,7 @@
 
 module Renderer (drawingError) where
 
+import Control.Monad
 import Data.Word
 import Data.Array.MArray
 import qualified Data.Traversable as T
@@ -54,6 +55,13 @@ import ColorMatrix
 --   C.renderWith surface $ renderPolygons d
 --   return surface
 
+data Color a = Color {
+      red   :: a,
+      green :: a,
+      blue  :: a,
+      alpha :: a
+}
+
 renderToPixbuf :: C.Render () -> IO (Maybe Pixbuf)
 renderToPixbuf render = do
   G.initGUI
@@ -73,69 +81,58 @@ renderToPixbuf render = do
                      pixmap <- P.pixmapNew (Just win) width height Nothing
                      pixbuf <- pixbufGetFromDrawable pixmap (Rectangle 0 0 width height)
                      return pixbuf
+        height = truncate S.maxHeight :: Int
+        width  = truncate S.maxWidth  :: Int
 
 renderPolygons :: DnaDrawing -> C.Render ()
-renderPolygons d = sequence_ $ map renderPolygon (polygons d)
+renderPolygons = sequence_ . map renderPolygon . polygons
+    where
+      renderPolygon :: DnaPolygon -> C.Render ()
+      renderPolygon p = do
+        renderBrush $ brush p
+        sequence $ map (\(DnaPoint x y) -> C.lineTo x y) (points p)
+        C.fill
 
-renderPolygon :: DnaPolygon -> C.Render ()
-renderPolygon p = do renderBrush $ brush p
-                     sequence $ map (\(DnaPoint x y) -> C.lineTo x y) (points p)
-                     C.fill
+      renderBrush :: B.DnaBrush -> C.Render ()
+      renderBrush br = C.setSourceRGBA r g b a
+          where r = normalize B.red br
+                g = normalize B.green br
+                b = normalize B.blue br
+                a = normalize B.alpha br
+                normalize f = (/255) . fromIntegral . f
 
-renderBrush :: B.DnaBrush -> C.Render ()
-renderBrush br = C.setSourceRGBA r g b a
-    where r = normalize B.red br
-          g = normalize B.green br
-          b = normalize B.blue br
-          a = normalize B.alpha br
-          normalize f = (/255) . fromIntegral . f
 
-height = truncate S.maxHeight :: Int
-width  = truncate S.maxWidth  :: Int
 
 drawingError :: DnaDrawing -> String -> IO (Maybe Word8)
 drawingError d path = do
   drawingPixbuf <- renderToPixbuf (renderPolygons d)
   imagePixbuf <- fileToPixbuf path
-  T.sequence $ do drawing <- drawingPixbuf
-                  image <- imagePixbuf
-                  return $ Renderer.error drawing image
-  
-error :: Pixbuf -> Pixbuf -> IO Word8
-error p1 p2 = do
-  colors1 <- colors p1
-  colors2 <- colors p2
-  return $ sum $ zipWith colorError colors1 colors2
+  T.sequence $ liftM2 error drawingPixbuf imagePixbuf
+      where
+        error :: Pixbuf -> Pixbuf -> IO Word8
+        error p1 p2 = do
+          colors1 <- colors p1
+          colors2 <- colors p2
+          return $ sum $ zipWith colorError colors1 colors2
 
-colors :: Pixbuf -> IO [Color Word8]
-colors p = do pix <- pixbufGetPixels p :: IO (G.PixbufData Int Word8)
-              els <- getElems pix
-              return $ toColors els
+        colors :: Pixbuf -> IO [Color Word8]
+        colors p = do pix <- pixbufGetPixels p :: IO (G.PixbufData Int Word8)
+                      els <- getElems pix
+                      return $ toColors els
 
-toColors :: [a] -> [Color a]
-toColors []           = []
-toColors (r:g:b:a:xs) = Color r g b a : toColors xs
-toColors _            = Prelude.error "wrong number of arguments"
+        toColors :: (Num a) => [a] -> [Color a]
+        toColors []         = []
+        toColors (r:g:b:xs) = Color r g b 255 : toColors xs
+        toColors _          = Prelude.error "wrong number of arguments"
        
-data Color a = Color {
-      red   :: a,
-      green :: a,
-      blue  :: a,
-      alpha :: a
-}
-
--- |Get the color error of two colors
-colorError :: (Num a) => Color a -> Color a -> a
-colorError c1 c2 = let deltaRed   = red c1 - red c2
-                       deltaGreen = green c1 - green c2
-                       deltaBlue  = blue c1 - blue c2
-                   in deltaRed * deltaRed +
-                      deltaGreen * deltaGreen +
-                      deltaBlue * deltaBlue
+        colorError :: (Num a) => Color a -> Color a -> a
+        colorError x y = delta red   * delta red +
+                         delta green * delta green +
+                         delta blue  * delta blue
+                             where delta f = f x - f y
    
-fileToPixbuf :: FilePath -> IO (Maybe Pixbuf)
-fileToPixbuf fp = C.withImageSurfaceFromPNG fp $ renderToPixbuf . renderSurface
+        fileToPixbuf :: FilePath -> IO (Maybe Pixbuf)
+        fileToPixbuf fp = C.withImageSurfaceFromPNG fp $ renderToPixbuf . renderSurface
 
-renderSurface :: C.Surface -> C.Render ()
-renderSurface s = do C.setSourceSurface s 0 0
-                     C.paint
+        renderSurface :: C.Surface -> C.Render ()
+        renderSurface s = C.setSourceSurface s 0 0 >> C.paint

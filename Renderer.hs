@@ -31,6 +31,7 @@ data Color a = Color {
       alpha :: a
 }
 
+-- | Rasterisation: FIXME
 renderToPixbuf :: C.Render () -> IO (Maybe Pixbuf)
 renderToPixbuf render = do
   G.initGUI
@@ -53,6 +54,7 @@ renderToPixbuf render = do
         height = truncate S.maxHeight :: Int
         width  = truncate S.maxWidth  :: Int
 
+-- | Render the drawing
 renderDrawing :: DnaDrawing -> C.Render ()
 renderDrawing = sequence_ . map renderPolygon . polygons
     where
@@ -70,8 +72,14 @@ renderDrawing = sequence_ . map renderPolygon . polygons
                 a = normalize B.alpha br
                 normalize f = (/255) . fromIntegral . f
 
-
-drawingError :: DnaDrawing -> FilePath -> IO (Maybe Word8)
+-- | 1. Rasterize the drawing
+--
+-- 2. Load an image from a file and rasterize it
+--
+-- 3. Compare the color values of the drawing and the image pixel by pixel
+drawingError :: DnaDrawing       -- ^ the drawing is rasterized
+             -> FilePath         -- ^ rasterize an image from a file
+             -> IO (Maybe Word8) -- ^ return the color pixel error
 drawingError d path = do
   drawingPixbuf <- renderToPixbuf (renderDrawing d)
   imagePixbuf <- fileToPixbuf path

@@ -54,23 +54,25 @@ renderToPixbuf render = do
         height = truncate S.maxHeight :: Int
         width  = truncate S.maxWidth  :: Int
 
--- | Render the drawing
-renderDrawing :: DnaDrawing -> C.Render ()
-renderDrawing = sequence_ . map renderPolygon . polygons
-    where
-      renderPolygon :: DnaPolygon -> C.Render ()
-      renderPolygon p = do
-        renderBrush $ brush p
-        sequence $ map (\(DnaPoint x y) -> C.lineTo x y) (points p)
-        C.fill
+class Renderable a where
+    render :: a -> C.Render ()
 
-      renderBrush :: B.DnaBrush -> C.Render ()
-      renderBrush br = C.setSourceRGBA r g b a
-          where r = normalize B.red br
-                g = normalize B.green br
-                b = normalize B.blue br
-                a = normalize B.alpha br
-                normalize f = (/255) . fromIntegral . f
+instance Renderable DnaPolygon where
+    render p = do
+      render (brush p)
+      sequence $ map (\(DnaPoint x y) -> C.lineTo x y) (points p)
+      C.fill
+
+instance Renderable B.DnaBrush where
+    render br = C.setSourceRGBA r g b a
+        where r = normalize B.red br
+              g = normalize B.green br
+              b = normalize B.blue br
+              a = normalize B.alpha br
+              normalize f = (/255) . fromIntegral . f
+
+instance Renderable DnaDrawing where
+    render = sequence_ . map render . polygons
 
 -- | 1. Rasterize the drawing
 --
@@ -81,7 +83,7 @@ drawingError :: DnaDrawing       -- ^ the drawing is rasterized
              -> FilePath         -- ^ rasterize an image from a file
              -> IO (Maybe Word8) -- ^ return the color pixel error
 drawingError d path = do
-  drawingPixbuf <- renderToPixbuf (renderDrawing d)
+  drawingPixbuf <- renderToPixbuf $ render d
   imagePixbuf <- fileToPixbuf path
   T.sequence $ liftM2 error drawingPixbuf imagePixbuf
       where

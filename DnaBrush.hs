@@ -47,11 +47,11 @@ mutateBrush (DnaBrush r g b a) = do r <- maybeMutate_ r activeRedMutationRate
                                     a <- maybeMutate_ a activeAlphaMutationRate 
                                          activeAlphaRangeMin activeAlphaRangeMax
                                     return (DnaBrush r g b a)
-
--- |Mutate a one-dimensional value
-maybeMutate_ :: Integer    -- ^ The unchanged value to pass through
-             -> Integer    -- ^ Mutation rate
-             -> Integer    -- ^ Minimum for random numbers
-             -> Integer    -- ^ Maximum for random numbers
-             -> IO Integer -- ^ Changed value
-maybeMutate_ unchanged rate min max = maybeMutate rate (getRandomNumber min max) unchanged
+    where
+      -- |Mutate a one-dimensional value
+      maybeMutate_ :: Integer    -- ^ The unchanged value to pass through
+                   -> Integer    -- ^ Mutation rate
+                   -> Integer    -- ^ Minimum for random numbers
+                   -> Integer    -- ^ Maximum for random numbers
+                   -> IO Integer -- ^ Changed value
+      maybeMutate_ unchanged rate min max = maybeMutate rate (getRandomNumber min max) unchanged

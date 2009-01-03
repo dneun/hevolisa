@@ -55,7 +55,7 @@ instance Renderable DnaDrawing where
     render = render . polygons
 
 instance (Renderable a) => Renderable [a] where
-    render = sequence_ . map render
+    render = mapM_ render
 
 
 -- | 1. Rasterize the drawing

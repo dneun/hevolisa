@@ -94,5 +94,5 @@ mutatePolygon p = maybeAddPoint p >>=
 
       -- |Mutate the polygon points
       mutatePoints :: DnaPolygon -> IO DnaPolygon
-      mutatePoints p = (sequence . map mutate . points) p >>= 
+      mutatePoints p = (mapM mutate . points) p >>= 
                        return . DnaPolygon (brush p)

@@ -18,23 +18,20 @@ import Debug.Trace
 -- |Context contains the current drawing and the source image for comparison
 data EvolutionContext = EvolutionContext {
       drawing :: DnaDrawing,
-      source  :: String
+      source  :: FilePath
     }  deriving (Show,Eq)
 
 generations = 10000
 
--- |Init the context with source image and initial drawing
-initContext :: String -> IO EvolutionContext
+-- |Init the cofntext with source image and initial drawing
+initContext :: FilePath  -> IO EvolutionContext
 initContext s = randomInit >>= return . flip EvolutionContext s
 
 -- |Start the evolution process
-start :: String -> IO EvolutionContext
+start :: FilePath -> IO EvolutionContext
 start s = foldl (>>=) (initContext s) (replicate generations step)
 
 -- |Color error, smaller is better
--- error :: EvolutionContext -> IO Double
--- error (EvolutionContext drawing source) = renderDrawing drawing >>= \d ->
---                                           return (imageError d source)
 error :: EvolutionContext -> IO (Maybe Word8)
 error (EvolutionContext drawing source) = drawingError drawing source
 

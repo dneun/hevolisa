@@ -9,11 +9,11 @@
 module Hevolisa.Shapes.DnaPoint (
                  DnaPoint (DnaPoint),
 
-                 -- Accessors
+                 -- * Accessors
                  pointX,
                  pointY,
 
-                 -- Constructors, mutate
+                 -- * Constructors, mutate
                  randomPoint
                 ) where
 

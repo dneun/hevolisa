@@ -9,7 +9,7 @@
 module Hevolisa.Shapes.DnaBrush (
                  DnaBrush,
                          
-                 -- Accessors
+                 -- * Accessors
                  red, green, blue, alpha
 ) where
 

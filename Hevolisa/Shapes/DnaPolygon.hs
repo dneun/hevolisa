@@ -9,7 +9,7 @@
 module Hevolisa.Shapes.DnaPolygon (
                    DnaPolygon,
 
-                   -- Accessors
+                   -- * Accessors
                    brush,
                    points
                   ) where

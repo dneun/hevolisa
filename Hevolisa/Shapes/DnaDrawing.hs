@@ -7,7 +7,8 @@
 -- Portability : portable
 
 module Hevolisa.Shapes.DnaDrawing ( DnaDrawing,
-                    polygons
+                                    -- * Accessors
+                                    polygons
 ) where
 
 import Hevolisa.Shapes.DnaPolygon ( DnaPolygon )

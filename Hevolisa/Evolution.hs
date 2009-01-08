@@ -19,7 +19,7 @@ import Debug.Trace
 data EvolutionContext = EvolutionContext {
       drawing :: DnaDrawing,
       image   :: FilePath
-}  deriving (Show, Eq)
+} deriving (Show, Eq)
 
 generations = 10000
 

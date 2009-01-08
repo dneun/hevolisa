@@ -7,14 +7,16 @@
 -- Portability : portable
 
 module Tools (
+              -- * Classes
               Mutable (mutate),
               Points (pointCount),
               RandomInit (randomInit),
 
+              -- * Utility functions
               maybeMutate,
               getRandomNumber,
 
-              -- List index functions
+              -- * List index functions
               addElem,
               removeElem,
               moveElem

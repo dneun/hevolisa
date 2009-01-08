@@ -6,7 +6,7 @@
 -- Stability   : experimental
 -- Portability : portable
 
-module DnaPolygon (
+module Hevolisa.Shapes.DnaPolygon (
                    DnaPolygon,
 
                    -- Accessors
@@ -14,10 +14,10 @@ module DnaPolygon (
                    points
                   ) where
 
-import Settings
-import Tools
-import DnaBrush ( DnaBrush )
-import DnaPoint ( DnaPoint( DnaPoint ), randomPoint, pointX, pointY )
+import Hevolisa.Settings
+import Hevolisa.Tools
+import Hevolisa.Shapes.DnaBrush ( DnaBrush )
+import Hevolisa.Shapes.DnaPoint ( DnaPoint( DnaPoint ), randomPoint, pointX, pointY )
 
 -- |A polygon has a brush for color and a list of points
 data DnaPolygon = DnaPolygon {

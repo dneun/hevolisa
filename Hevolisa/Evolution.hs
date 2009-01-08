@@ -6,13 +6,13 @@
 -- Stability   : experimental
 -- Portability : portable
 
-module Evolution where
+module Hevolisa.Evolution where
 
 import Data.Word
 import Prelude hiding (error)
-import DnaDrawing
-import Tools
-import Renderer ( drawingError )
+import Hevolisa.Shapes.DnaDrawing
+import Hevolisa.Tools
+import Hevolisa.Renderer ( drawingError )
 import Debug.Trace
 
 -- |Context contains the current drawing and the source image for comparison

@@ -6,7 +6,7 @@
 -- Stability   : experimental
 -- Portability : portable
 
-module DnaPoint (
+module Hevolisa.Shapes.DnaPoint (
                  DnaPoint (DnaPoint),
 
                  -- Accessors
@@ -17,8 +17,8 @@ module DnaPoint (
                  randomPoint
                 ) where
 
-import Settings
-import Tools
+import Hevolisa.Settings
+import Hevolisa.Tools
 
 -- |Mutable Point
 data DnaPoint = DnaPoint {

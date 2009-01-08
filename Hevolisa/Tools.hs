@@ -6,7 +6,7 @@
 -- Stability   : experimental
 -- Portability : portable
 
-module Tools (
+module Hevolisa.Tools (
               -- * Classes
               Mutable (mutate),
               Points (pointCount),

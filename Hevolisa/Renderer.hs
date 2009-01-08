@@ -6,7 +6,7 @@
 -- Stability   : experimental
 -- Portability : portable
 
-module Renderer (drawingError) where
+module Hevolisa.Renderer (drawingError) where
 
 import Control.Monad
 import Data.Word
@@ -17,11 +17,11 @@ import qualified Graphics.Rendering.Cairo as C
 import qualified Graphics.UI.Gtk.Gdk.Pixmap as P
 import Graphics.UI.Gtk.Gdk.Pixbuf
 import Graphics.UI.Gtk.General.Structs hiding (Color)
-import DnaDrawing
-import DnaPolygon
-import qualified DnaBrush as B
-import DnaPoint
-import qualified Settings as S
+import Hevolisa.Shapes.DnaDrawing
+import Hevolisa.Shapes.DnaPolygon
+import qualified Hevolisa.Shapes.DnaBrush as B
+import Hevolisa.Shapes.DnaPoint
+import qualified Hevolisa.Settings as S
 
 
 data Color a = Color {

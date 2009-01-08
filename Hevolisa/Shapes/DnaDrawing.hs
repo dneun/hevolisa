@@ -6,13 +6,13 @@
 -- Stability   : experimental
 -- Portability : portable
 
-module DnaDrawing ( DnaDrawing,
+module Hevolisa.Shapes.DnaDrawing ( DnaDrawing,
                     polygons
 ) where
 
-import DnaPolygon ( DnaPolygon )
-import Tools
-import Settings
+import Hevolisa.Shapes.DnaPolygon ( DnaPolygon )
+import Hevolisa.Tools
+import Hevolisa.Settings
 
 -- |A drawing contains an ordered set of polygons
 data DnaDrawing = DnaDrawing {

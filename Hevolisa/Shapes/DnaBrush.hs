@@ -6,15 +6,15 @@
 -- Stability   : experimental
 -- Portability : portable
 
-module DnaBrush (
+module Hevolisa.Shapes.DnaBrush (
                  DnaBrush,
                          
                  -- Accessors
                  red, green, blue, alpha
 ) where
 
-import Settings
-import Tools
+import Hevolisa.Settings
+import Hevolisa.Tools
 
 -- |Brush to color polygons
 data DnaBrush = DnaBrush {

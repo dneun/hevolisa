@@ -8,10 +8,10 @@
 
 module Main where
 
-import DnaDrawing
-import Tools (randomInit, mutate)
-import Renderer
-import Evolution (start)
+import Hevolisa.Shapes.DnaDrawing
+import Hevolisa.Tools (randomInit, mutate)
+import Hevolisa.Renderer
+import Hevolisa.Evolution (start)
 
 generations = 10000
 

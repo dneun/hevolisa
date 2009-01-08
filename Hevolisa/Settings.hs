@@ -6,7 +6,7 @@
 -- Stability   : experimental
 -- Portability : portable
 
-module Settings where
+module Hevolisa.Settings where
 
 activeAddPointMutationRate = 1500
 activeAddPolygonMutationRate = 700

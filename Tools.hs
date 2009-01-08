@@ -61,21 +61,27 @@ maybeMutate rate action unchanged = do mutate <- willMutate rate
                                        if mutate then action else return unchanged
 
 -- |Move a list element from index to index
-moveElem :: Int -- ^ From index
-         -> Int -- ^ To index
-         -> [a] -> [a]
+moveElem :: Int -- ^ from index
+         -> Int -- ^ to index
+         -> [a] -- ^ original list 
+         -> [a] -- ^ result
 moveElem from to lst = addElem elem to $ removeElem from lst
     where elem = lst !! from
 
 
 -- |Remove an item at index position from list
-removeElem :: Int -> [a] -> [a]
+removeElem :: Int -- ^ index
+           -> [a] -- ^ original list
+           -> [a] -- ^ result
 removeElem n lst = left ++ right
     where left = take n lst
           right = drop (n + 1) lst
 
 -- |Add an item at index position to list
-addElem :: a -> Int -> [a] -> [a]
+addElem :: a   -- ^ element
+        -> Int -- ^ index
+        -> [a] -- ^ original list
+        -> [a] -- ^ result
 addElem item index lst = left ++ [item] ++ right
     where left = take index lst
           right = drop index lst

@@ -18,12 +18,12 @@ import Debug.Trace
 -- |Context contains the current drawing and the source image for comparison
 data EvolutionContext = EvolutionContext {
       drawing :: DnaDrawing,
-      source  :: FilePath
-    }  deriving (Show,Eq)
+      image   :: FilePath
+}  deriving (Show, Eq)
 
 generations = 10000
 
--- |Init the cofntext with source image and initial drawing
+-- |Init the context with image and initial drawing
 initContext :: FilePath  -> IO EvolutionContext
 initContext s = randomInit >>= return . flip EvolutionContext s
 

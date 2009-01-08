@@ -34,7 +34,9 @@ class Points a where
     -- |Count the points
     pointCount :: (Integral b) => a -> b
 
+-- |Initialize a shape with random values
 class RandomInit a where
+    -- |Action that returns a shape with random values
     randomInit :: IO a
 
 -- |Decide whether it`s time for a mutation

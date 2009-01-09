@@ -14,6 +14,7 @@ module Hevolisa.Shapes.DnaPolygon (
                    points
                   ) where
 
+import Control.Monad ( replicateM )
 import Hevolisa.Settings
 import Hevolisa.Tools
 import Hevolisa.Shapes.DnaBrush ( DnaBrush )
@@ -36,7 +37,7 @@ instance RandomInit DnaPolygon where
                     return (DnaPolygon brush points)
         where randomPoints :: Integer -> IO [DnaPoint]
               randomPoints n = randomInit >>=
-                               sequence . replicate (fromIntegral n) . randomPoint
+                               replicateM (fromIntegral n) . randomPoint
 
 -- |A polygon has mutable DNA
 instance Mutable DnaPolygon where

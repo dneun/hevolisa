@@ -20,7 +20,7 @@ data EvolutionContext = EvolutionContext {
       image   :: FilePath
 } deriving (Show, Eq)
 
-generations = 50
+generations = 4000
 
 -- |Init the context with image and initial drawing
 initContext :: FilePath  -> IO EvolutionContext
@@ -39,7 +39,7 @@ error (EvolutionContext drawing source) = drawingError drawing source
 -- |EvolutionContext mutates minimizing the error
 instance Mutable EvolutionContext where
     mutate c = do (context,error) <- step c
-                  trace (show error)$ trace "--" $ return context
+                  trace (show error) $ return context
 
 -- |Single evolution step, minimize error
 step :: EvolutionContext -> IO (EvolutionContext,Integer)

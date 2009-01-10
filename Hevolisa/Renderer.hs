@@ -94,12 +94,12 @@ drawingError d path = do
                              where delta f = f x - f y
 
         toSurface :: C.Render () -> IO C.Surface
-        toSurface r = do surface <- C.createImageSurface C.FormatARGB32 width height
+        toSurface r = do surface <- C.createImageSurface C.FormatRGB24 width height
                          C.renderWith surface r
                          return surface
 
 drawingToFile :: DnaDrawing -> IO ()
-drawingToFile d = C.withImageSurface C.FormatARGB32 width height $ \result -> do
+drawingToFile d = C.withImageSurface C.FormatRGB24 width height $ \result -> do
                     C.renderWith result $ render d
                     C.surfaceWriteToPNG result "result.png"
 

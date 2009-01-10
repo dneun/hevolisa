@@ -8,7 +8,6 @@
 
 module Hevolisa.Evolution where
 
-import Data.Word
 import Prelude hiding (error)
 import Hevolisa.Shapes.DnaDrawing
 import Hevolisa.Tools
@@ -21,7 +20,7 @@ data EvolutionContext = EvolutionContext {
       image   :: FilePath
 } deriving (Show, Eq)
 
-generations = 1000
+generations = 50
 
 -- |Init the context with image and initial drawing
 initContext :: FilePath  -> IO EvolutionContext
@@ -34,7 +33,7 @@ start s = do ec <- foldl (>>=) (initContext s) (replicate generations mutate)
              return ec
 
 -- |Color error, smaller is better
-error :: EvolutionContext -> IO Word8
+error :: EvolutionContext -> IO Integer
 error (EvolutionContext drawing source) = drawingError drawing source
 
 -- |EvolutionContext mutates minimizing the error
@@ -43,7 +42,7 @@ instance Mutable EvolutionContext where
                   trace (show error)$ trace "--" $ return context
 
 -- |Single evolution step, minimize error
-step :: EvolutionContext -> IO (EvolutionContext,Word8)
+step :: EvolutionContext -> IO (EvolutionContext,Integer)
 step ec = do next <- mutateEvolutionContext ec
              e1 <- error ec
              e2 <- error next

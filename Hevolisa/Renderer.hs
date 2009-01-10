@@ -66,24 +66,25 @@ instance (Renderable a) => Renderable [a] where
 -- 3. Compare the color values of the drawing and the image pixel by pixel
 drawingError :: DnaDrawing  -- ^ the drawing is rasterized
              -> FilePath    -- ^ rasterize an image from a file
-             -> IO Word8    -- ^ return the color pixel error
+             -> IO Integer  -- ^ return the color pixel error
 drawingError d path = do
   drawing <- toSurface $ render d
   C.withImageSurfaceFromPNG path $ \image -> error drawing image
       where
-        error :: C.Surface -> C.Surface -> IO Word8
+        error :: C.Surface -> C.Surface -> IO Integer
         error s1 s2 = do
           colors1 <- colors s1
           colors2 <- colors s2
           return $ sum $ zipWith colorError colors1 colors2
 
-        colors :: C.Surface -> IO [Color Word8]
+        colors :: C.Surface -> IO [Color Integer]
         colors s = do bs <- C.imageSurfaceGetData s
                       return $ toColors $ unpack bs
 
-        toColors :: (Num a) => [a] -> [Color a]
+        toColors :: [Word8] -> [Color Integer]
         toColors []           = []
-        toColors (r:g:b:a:xs) = Color r g b a : toColors xs
+        toColors (r:g:b:a:xs) = Color (fromIntegral r) (fromIntegral g) 
+                                (fromIntegral b) (fromIntegral a) : toColors xs
         toColors _            = Prelude.error "wrong number of arguments"
        
         colorError :: (Num a) => Color a -> Color a -> a

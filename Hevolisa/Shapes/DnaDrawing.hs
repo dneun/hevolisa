@@ -39,7 +39,8 @@ addPolygon ps = do random <- getRandomNumber 0 (length ps)
 
 -- |Drawing has mutable DNA
 instance Mutable DnaDrawing where
-    mutate = mutateDrawing
+    mutate old = do new <- mutateDrawing old
+                    if (new /= old) then return new else mutate old
 
 
 -- |Basic drawing mutation function

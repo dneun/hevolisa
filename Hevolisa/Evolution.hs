@@ -29,22 +29,23 @@ initContext s = randomInit >>= return . flip EvolutionContext s
 
 -- |Start the evolution process
 start :: FilePath -> IO EvolutionContext
-start s = foldl (>>=) (initContext s) (replicate generations step)
+start s = foldl (>>=) (initContext s) (replicate generations mutate)
 
 -- |Color error, smaller is better
-error :: EvolutionContext -> IO (Maybe Word8)
+error :: EvolutionContext -> IO Word8
 error (EvolutionContext drawing source) = drawingError drawing source
 
 -- |EvolutionContext mutates minimizing the error
 instance Mutable EvolutionContext where
-    mutate = step
+    mutate c = do (context,error) <- step c
+                  trace (show error)$ trace "--" $ return context
 
 -- |Single evolution step, minimize error
-step :: EvolutionContext -> IO EvolutionContext
+step :: EvolutionContext -> IO (EvolutionContext,Word8)
 step ec = do next <- mutateEvolutionContext ec
              e1 <- error ec
              e2 <- error next
-             if e1 < e2 then trace (show e1) return ec else trace (show e2) return next
+             if e1 < e2 then return (ec,e1) else return (next,e2)
 
 -- |Mutate the drawing in the EvolutionContext
 mutateEvolutionContext :: EvolutionContext -> IO EvolutionContext

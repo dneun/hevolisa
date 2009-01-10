@@ -9,8 +9,8 @@
 module Hevolisa.Renderer (drawingError) where
 
 import Control.Monad
+import Data.ByteString hiding (zipWith)
 import Data.Word
-import Data.Array.MArray
 import qualified Data.Traversable as T
 import qualified Graphics.UI.Gtk as G
 import qualified Graphics.Rendering.Cairo as C
@@ -22,6 +22,7 @@ import Hevolisa.Shapes.DnaPolygon
 import qualified Hevolisa.Shapes.DnaBrush as B
 import Hevolisa.Shapes.DnaPoint
 import qualified Hevolisa.Settings as S
+--import Debug.Trace
 
 
 data Color a = Color {
@@ -29,7 +30,7 @@ data Color a = Color {
       green :: a,
       blue  :: a,
       alpha :: a
-}
+} deriving (Show)
 
 class Renderable a where
     render :: a -> C.Render ()
@@ -63,29 +64,27 @@ instance (Renderable a) => Renderable [a] where
 -- 2. Load an image from a file and rasterize it
 --
 -- 3. Compare the color values of the drawing and the image pixel by pixel
-drawingError :: DnaDrawing       -- ^ the drawing is rasterized
-             -> FilePath         -- ^ rasterize an image from a file
-             -> IO (Maybe Word8) -- ^ return the color pixel error
+drawingError :: DnaDrawing  -- ^ the drawing is rasterized
+             -> FilePath    -- ^ rasterize an image from a file
+             -> IO Word8    -- ^ return the color pixel error
 drawingError d path = do
-  drawingPixbuf <- renderToPixbuf $ render d
-  imagePixbuf <- fileToPixbuf path
-  T.sequence $ liftM2 error drawingPixbuf imagePixbuf
+  drawing <- toSurface $ render d
+  C.withImageSurfaceFromPNG path $ \image -> error drawing image
       where
-        error :: Pixbuf -> Pixbuf -> IO Word8
-        error p1 p2 = do
-          colors1 <- colors p1
-          colors2 <- colors p2
+        error :: C.Surface -> C.Surface -> IO Word8
+        error s1 s2 = do
+          colors1 <- colors s1
+          colors2 <- colors s2
           return $ sum $ zipWith colorError colors1 colors2
 
-        colors :: Pixbuf -> IO [Color Word8]
-        colors p = do pix <- pixbufGetPixels p :: IO (G.PixbufData Int Word8)
-                      els <- getElems pix
-                      return $ toColors els
+        colors :: C.Surface -> IO [Color Word8]
+        colors s = do bs <- C.imageSurfaceGetData s
+                      return $ toColors $ unpack bs
 
         toColors :: (Num a) => [a] -> [Color a]
-        toColors []         = []
-        toColors (r:g:b:xs) = Color r g b 255 : toColors xs
-        toColors _          = Prelude.error "wrong number of arguments"
+        toColors []           = []
+        toColors (r:g:b:a:xs) = Color r g b a : toColors xs
+        toColors _            = Prelude.error "wrong number of arguments"
        
         colorError :: (Num a) => Color a -> Color a -> a
         colorError x y = delta red   * delta red +
@@ -93,32 +92,11 @@ drawingError d path = do
                          delta blue  * delta blue
                              where delta f = f x - f y
    
-        fileToPixbuf :: FilePath -> IO (Maybe Pixbuf)
-        fileToPixbuf fp = C.withImageSurfaceFromPNG fp $ renderToPixbuf . renderSurface
+        toSurface :: C.Render () -> IO C.Surface
+        toSurface r = do surface <- C.createImageSurface C.FormatARGB32 width height
+                         C.renderWith surface r
+                         return surface
 
-        renderSurface :: C.Surface -> C.Render ()
-        renderSurface s = C.setSourceSurface s 0 0 >> C.paint
-
-
--- | Rasterisation: FIXME
-renderToPixbuf :: C.Render () -> IO (Maybe Pixbuf)
-renderToPixbuf render = do
-  G.initGUI
-  window <- G.windowNew
-  canvas <- G.drawingAreaNew
-  G.set window [G.containerChild G.:= canvas]
-  G.widgetShowAll window
-  G.flush
-  pixbuf <- updateCanvas canvas render
-  G.widgetDestroy window
-  return pixbuf
-
-  where updateCanvas :: G.DrawingArea -> C.Render () -> IO (Maybe Pixbuf)
-        updateCanvas canvas act = do
-                     win <- widgetGetDrawWindow canvas
-                     G.renderWithDrawable win act
-                     pixmap <- P.pixmapNew (Just win) width height Nothing
-                     pixbuf <- pixbufGetFromDrawable pixmap (Rectangle 0 0 width height)
-                     return pixbuf
         height = truncate S.maxHeight :: Int
         width  = truncate S.maxWidth  :: Int
+        

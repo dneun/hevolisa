@@ -6,7 +6,7 @@
 -- Stability   : experimental
 -- Portability : portable
 
-module Hevolisa.Renderer (drawingError) where
+module Hevolisa.Renderer (drawingError,drawingToFile) where
 
 import Control.Monad
 import Data.ByteString hiding (zipWith)
@@ -91,12 +91,16 @@ drawingError d path = do
                          delta green * delta green +
                          delta blue  * delta blue
                              where delta f = f x - f y
-   
+
         toSurface :: C.Render () -> IO C.Surface
         toSurface r = do surface <- C.createImageSurface C.FormatARGB32 width height
                          C.renderWith surface r
                          return surface
 
-        height = truncate S.maxHeight :: Int
-        width  = truncate S.maxWidth  :: Int
-        
+drawingToFile :: DnaDrawing -> IO ()
+drawingToFile d = C.withImageSurface C.FormatARGB32 width height $ \result -> do
+                    C.renderWith result $ render d
+                    C.surfaceWriteToPNG result "result.png"
+
+height = truncate S.maxHeight :: Int
+width  = truncate S.maxWidth  :: Int

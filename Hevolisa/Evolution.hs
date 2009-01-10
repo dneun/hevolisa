@@ -12,7 +12,7 @@ import Data.Word
 import Prelude hiding (error)
 import Hevolisa.Shapes.DnaDrawing
 import Hevolisa.Tools
-import Hevolisa.Renderer ( drawingError )
+import Hevolisa.Renderer ( drawingError,drawingToFile )
 import Debug.Trace
 
 -- |Context contains the current drawing and the source image for comparison
@@ -21,7 +21,7 @@ data EvolutionContext = EvolutionContext {
       image   :: FilePath
 } deriving (Show, Eq)
 
-generations = 10000
+generations = 1000
 
 -- |Init the context with image and initial drawing
 initContext :: FilePath  -> IO EvolutionContext
@@ -29,7 +29,9 @@ initContext s = randomInit >>= return . flip EvolutionContext s
 
 -- |Start the evolution process
 start :: FilePath -> IO EvolutionContext
-start s = foldl (>>=) (initContext s) (replicate generations mutate)
+start s = do ec <- foldl (>>=) (initContext s) (replicate generations mutate)
+             drawingToFile $ drawing ec
+             return ec
 
 -- |Color error, smaller is better
 error :: EvolutionContext -> IO Word8

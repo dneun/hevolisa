@@ -7,5 +7,17 @@ http://rogeralsing.com/2008/12/07/genetic-programming-evolution-of-mona-lisa/
 
 The source code (C#) can be found in the FAQ section.
 
-The evolution and mutation part is almost finished. I still have some
-problems with the cairo/gtk rasterisation routine: Render -> Pixbuf
+Current status: The evolution part is pretty stable. I finally got the
+rendering part working with a current development version of
+gtk2hs. The gtk2hs method imageSurfaceGetData (Surface -> ByteString)
+is essential for the color error implementation. It is currently only
+available in the development version of gtk2hs. The number of
+evolutionary steps can be defined and after the execution of the steps 
+the current polygon drawing is written to a file.
+
+TODO List
+
+-> optimize performance - the image is currently loaded in every step
+-> create a nice GUI (at the moment there is no user interface)
+-> update haddock documentation
+-> upload to hackage

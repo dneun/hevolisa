@@ -5,7 +5,7 @@ HEvoLisa is a Haskell port of the EvoLisa program which can be found here:
 http://rogeralsing.com/2008/12/07/genetic-programming-evolution-of-mona-lisa/
 [Genetic Programming: Evolution of Mona Lisa - Roger Alsing Weblog].
 
-The source code (C#) can be found in the FAQ section.
+The original source code (C#) can be found in the FAQ section.
 
 Current status: The evolution part is pretty stable. I finally got the
 rendering part working with a current development version of
@@ -13,7 +13,7 @@ gtk2hs. The gtk2hs method imageSurfaceGetData (Surface -> ByteString)
 is essential for the color error implementation. It is currently only
 available in the development version of gtk2hs. The number of
 evolutionary steps can be defined and after the execution of the steps 
-the current polygon drawing is written to a file.
+the current polygon drawing is written to a PNG file.
 
 TODO List
 

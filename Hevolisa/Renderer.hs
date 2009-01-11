@@ -9,7 +9,7 @@
 module Hevolisa.Renderer (drawingError,drawingToFile) where
 
 import Control.Monad
-import Data.ByteString hiding (zipWith)
+import Data.ByteString (unpack)
 import Data.Word
 import qualified Data.Traversable as T
 import qualified Graphics.UI.Gtk as G
@@ -79,19 +79,20 @@ drawingError d path = do
 
         colors :: C.Surface -> IO [Color Integer]
         colors s = do bs <- C.imageSurfaceGetData s
-                      return $ toColors $ unpack bs
+                      return $ toColors $ map fromIntegral $ unpack bs
 
-        toColors :: [Word8] -> [Color Integer]
+        toColors :: (Num a) => [a] -> [Color a]
         toColors []           = []
-        toColors (r:g:b:a:xs) = Color (fromIntegral r) (fromIntegral g) 
-                                (fromIntegral b) (fromIntegral a) : toColors xs
+        toColors (r:g:b:a:xs) = Color r g b a : toColors xs
         toColors _            = Prelude.error "wrong number of arguments"
        
         colorError :: (Num a) => Color a -> Color a -> a
-        colorError x y = delta red   * delta red +
-                         delta green * delta green +
-                         delta blue  * delta blue
-                             where delta f = f x - f y
+        colorError x y = deltaRed   * deltaRed +
+                         deltaGreen * deltaGreen +
+                         deltaBlue  * deltaBlue
+            where deltaRed   = red x - red y
+                  deltaGreen = green x - green y
+                  deltaBlue  = blue x - blue y
 
         toSurface :: C.Render () -> IO C.Surface
         toSurface r = do surface <- C.createImageSurface C.FormatRGB24 width height

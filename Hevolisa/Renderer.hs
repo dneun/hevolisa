@@ -78,8 +78,8 @@ drawingError d path = do
           return $ sum $ zipWith colorError colors1 colors2
 
         colors :: C.Surface -> IO [Color Integer]
-        colors s = do bs <- C.imageSurfaceGetData s
-                      return $ toColors $ map fromIntegral $ unpack bs
+        colors s = C.imageSurfaceGetData s >>=
+                   return . toColors . map fromIntegral . unpack
 
         toColors :: (Num a) => [a] -> [Color a]
         toColors []           = []

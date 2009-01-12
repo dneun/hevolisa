@@ -17,7 +17,12 @@ the current polygon drawing is written to a PNG file.
 
 TODO List
 
--> optimize performance - the image is currently loaded in every step
--> create a nice GUI (at the moment there is no user interface)
+-> profiling, optimize performance - the image is currently loaded in every step
 -> update haddock documentation
 -> upload to hackage
+
+The Future
+
+-> await the next stable release of gtk2hs
+-> create a nice GUI (at the moment there is no user interface)
+-> Vectorisation/ GHC/Data Parallel Haskell for the error function

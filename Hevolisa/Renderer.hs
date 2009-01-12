@@ -87,12 +87,11 @@ drawingError d path = do
         toColors _            = Prelude.error "wrong number of arguments"
        
         colorError :: (Num a) => Color a -> Color a -> a
-        colorError x y = deltaRed   * deltaRed +
-                         deltaGreen * deltaGreen +
-                         deltaBlue  * deltaBlue
-            where deltaRed   = red x - red y
-                  deltaGreen = green x - green y
-                  deltaBlue  = blue x - blue y
+        colorError x y = r * r + g * g + b * b
+                      where r = delta red
+                            g = delta green
+                            b = delta blue
+                            delta f = f x - f y
 
         toSurface :: C.Render () -> IO C.Surface
         toSurface r = do surface <- C.createImageSurface C.FormatRGB24 width height

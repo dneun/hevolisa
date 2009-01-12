@@ -8,21 +8,13 @@
 
 module Hevolisa.Renderer (drawingError,drawingToFile) where
 
-import Control.Monad
 import Data.ByteString (unpack)
-import Data.Word
-import qualified Data.Traversable as T
-import qualified Graphics.UI.Gtk as G
 import qualified Graphics.Rendering.Cairo as C
-import qualified Graphics.UI.Gtk.Gdk.Pixmap as P
-import Graphics.UI.Gtk.Gdk.Pixbuf
-import Graphics.UI.Gtk.General.Structs hiding (Color)
 import Hevolisa.Shapes.DnaDrawing
 import Hevolisa.Shapes.DnaPolygon
 import qualified Hevolisa.Shapes.DnaBrush as B
 import Hevolisa.Shapes.DnaPoint
 import qualified Hevolisa.Settings as S
---import Debug.Trace
 
 
 data Color a = Color {

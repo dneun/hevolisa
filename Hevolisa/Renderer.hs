@@ -38,11 +38,11 @@ instance Renderable DnaPolygon where
 
 instance Renderable B.DnaBrush where
     render br = C.setSourceRGBA r g b a
-        where r = normalize B.red br
-              g = normalize B.green br
-              b = normalize B.blue br
-              a = normalize B.alpha br
-              normalize f = (/255) . fromIntegral . f
+        where r = normalize $ B.red br
+              g = normalize $ B.green br
+              b = normalize $ B.blue br
+              a = normalize $ B.alpha br
+              normalize = (/255) . fromIntegral
 
 instance Renderable DnaDrawing where
     render = render . polygons

@@ -56,37 +56,31 @@ instance (Renderable a) => Renderable [a] where
 -- 2. Load an image from a file and rasterize it
 --
 -- 3. Compare the color values of the drawing and the image pixel by pixel
-drawingError :: DnaDrawing       -- ^ the drawing is rasterized
-             -> [Color Integer]  -- ^ rasterize an image from a file
-             -> IO Integer       -- ^ return the color pixel error
-drawingError d image = toSurface (render d) >>= colors >>= return . error image
+drawingError :: DnaDrawing -- ^ the drawing is rasterized
+             -> [Integer]  -- ^ rasterize an image from a file
+             -> IO Integer -- ^ return the color pixel error
+drawingError d image = toSurface (render d) >>= removeAlpha >>= return . error image
     where
-      error :: [Color Integer] -> [Color Integer] -> Integer
-      error c1 c2 = sum $ zipWith colorError c1 c2
-
-      colorError :: (Num a) => Color a -> Color a -> a
-      colorError x y = r * r + g * g + b * b
-          where r = delta red
-                g = delta green
-                b = delta blue
-                delta f = f x - f y
+      error :: [Integer] -> [Integer] -> Integer
+      error c1 c2 = sum $ zipWith (\x y -> (x - y)^2) c1 c2
                           
       toSurface :: C.Render () -> IO C.Surface
       toSurface r = do surface <- C.createImageSurface C.FormatRGB24 width height
                        C.renderWith surface r
                        return surface
 
-colors :: C.Surface -> IO [Color Integer]
-colors s = C.imageSurfaceGetData s >>=
-           return . toColors . map fromIntegral . unpack
-                  where
-                    toColors :: (Num a) => [a] -> [Color a]
-                    toColors []           = []
-                    toColors (r:g:b:a:xs) = Color r g b a : toColors xs
-                    toColors _            = Prelude.error "wrong number of arguments"
+-- | remove the alpha channel
+removeAlpha :: C.Surface -> IO [Integer]
+removeAlpha s = C.imageSurfaceGetData s >>=
+                return . remove . map fromIntegral . unpack
+                    where
+                      remove :: [a] -> [a]
+                      remove []           = []
+                      remove (r:g:b:a:xs) = r:g:b:remove xs
+                      remove _            = Prelude.error "wrong number of color values"
 
-imageColors :: FilePath -> IO [Color Integer]
-imageColors fp = C.withImageSurfaceFromPNG fp colors
+imageColors :: FilePath -> IO [Integer]
+imageColors fp = C.withImageSurfaceFromPNG fp removeAlpha
                  
 drawingToFile :: DnaDrawing -> IO ()
 drawingToFile d = C.withImageSurface C.FormatRGB24 width height $ \result -> do

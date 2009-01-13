@@ -11,19 +11,19 @@ module Hevolisa.Evolution where
 import Prelude hiding (error)
 import Hevolisa.Shapes.DnaDrawing
 import Hevolisa.Tools
-import Hevolisa.Renderer ( Color,drawingError,drawingToFile,imageColors)
+import Hevolisa.Renderer ( drawingError,drawingToFile,imageColors)
 import Debug.Trace
 
 -- |Context contains the current drawing and the source image for comparison
 data EvolutionContext = EvolutionContext {
       drawing :: DnaDrawing,
-      image   :: [Color Integer]
+      image   :: [Integer]
 } deriving (Show, Eq)
 
 generations = 4000
 
 -- |Init the context with image and initial drawing
-initContext :: [Color Integer]  -> IO EvolutionContext
+initContext :: [Integer]  -> IO EvolutionContext
 initContext s = randomInit >>= return . flip EvolutionContext s
 
 -- |Start the evolution process

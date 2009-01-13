@@ -6,7 +6,7 @@
 -- Stability   : experimental
 -- Portability : portable
 
-module Hevolisa.Renderer (Color,drawingError,imageColors,drawingToFile) where
+module Hevolisa.Renderer (drawingError,imageColors,drawingToFile) where
 
 import Data.ByteString (unpack)
 import qualified Graphics.Rendering.Cairo as C
@@ -16,13 +16,6 @@ import qualified Hevolisa.Shapes.DnaBrush as B
 import Hevolisa.Shapes.DnaPoint
 import qualified Hevolisa.Settings as S
 
-
-data Color a = Color {
-      red   :: a,
-      green :: a,
-      blue  :: a,
-      alpha :: a
-} deriving (Show,Eq)
 
 class Renderable a where
     render :: a -> C.Render ()

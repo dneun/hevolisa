@@ -17,7 +17,7 @@ the current polygon drawing is written to a PNG file.
 
 TODO List
 
--> profiling, optimize performance - the image is currently loaded in every step
+-> profiling, optimize performance
 -> update haddock documentation
 -> upload to hackage
 

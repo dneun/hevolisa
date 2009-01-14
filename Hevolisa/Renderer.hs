@@ -6,7 +6,10 @@
 -- Stability   : experimental
 -- Portability : portable
 
-module Hevolisa.Renderer (drawingError,imageColors,drawingToFile) where
+module Hevolisa.Renderer (drawingError,
+                          withImageFromPNG,
+                          drawingToFile) 
+where
 
 import Data.ByteString (unpack)
 import qualified Graphics.Rendering.Cairo as C
@@ -74,8 +77,8 @@ unpackSurface s = C.imageSurfaceGetData s >>=
       removeAlpha (r:g:b:a:xs) = r:g:b:removeAlpha xs
       removeAlpha _            = Prelude.error "wrong number of color values"
 
-imageColors :: FilePath -> IO [Integer]
-imageColors fp = C.withImageSurfaceFromPNG fp unpackSurface
+withImageFromPNG :: FilePath -> ([Integer] -> IO a) -> IO a
+withImageFromPNG fp f = C.withImageSurfaceFromPNG fp unpackSurface >>= f
                  
 drawingToFile :: DnaDrawing -> IO ()
 drawingToFile d = C.withImageSurface C.FormatRGB24 width height $ \result -> do

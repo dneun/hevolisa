@@ -52,7 +52,9 @@ instance (Renderable a) => Renderable [a] where
 drawingError :: DnaDrawing -- ^ the drawing is rasterized
              -> [Integer]  -- ^ rasterize an image from a file
              -> IO Integer -- ^ return the color pixel error
-drawingError d image = toSurface (render d) >>= unpackSurface >>= return . error image
+drawingError d image = toSurface (render d) >>= 
+                       unpackSurface >>= 
+                       return . error image
     where
       error :: [Integer] -> [Integer] -> Integer
       error c1 c2 = sum $ zipWith (\x y -> (x - y)^2) c1 c2

@@ -52,7 +52,7 @@ instance (Renderable a) => Renderable [a] where
 drawingError :: DnaDrawing -- ^ the drawing is rasterized
              -> [Integer]  -- ^ rasterize an image from a file
              -> IO Integer -- ^ return the color pixel error
-drawingError d image = toSurface (render d) >>= removeAlpha >>= return . error image
+drawingError d image = toSurface (render d) >>= unpackSurface >>= return . error image
     where
       error :: [Integer] -> [Integer] -> Integer
       error c1 c2 = sum $ zipWith (\x y -> (x - y)^2) c1 c2
@@ -63,17 +63,17 @@ drawingError d image = toSurface (render d) >>= removeAlpha >>= return . error i
                        return surface
 
 -- | remove the alpha channel
-removeAlpha :: C.Surface -> IO [Integer]
-removeAlpha s = C.imageSurfaceGetData s >>=
-                return . remove . map fromIntegral . unpack
-                    where
-                      remove :: [a] -> [a]
-                      remove []           = []
-                      remove (r:g:b:a:xs) = r:g:b:remove xs
-                      remove _            = Prelude.error "wrong number of color values"
+unpackSurface :: C.Surface -> IO [Integer]
+unpackSurface s = C.imageSurfaceGetData s >>=
+                  return . removeAlpha . map fromIntegral . unpack
+    where
+      removeAlpha :: [a] -> [a]
+      removeAlpha []           = []
+      removeAlpha (r:g:b:a:xs) = r:g:b:removeAlpha xs
+      removeAlpha _            = Prelude.error "wrong number of color values"
 
 imageColors :: FilePath -> IO [Integer]
-imageColors fp = C.withImageSurfaceFromPNG fp removeAlpha
+imageColors fp = C.withImageSurfaceFromPNG fp unpackSurface
                  
 drawingToFile :: DnaDrawing -> IO ()
 drawingToFile d = C.withImageSurface C.FormatRGB24 width height $ \result -> do

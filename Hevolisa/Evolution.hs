@@ -26,12 +26,15 @@ generations = 4000
 initContext :: [Integer]  -> IO EvolutionContext
 initContext s = randomInit >>= return . flip EvolutionContext s
 
+-- |Number of mutations between image writes
+imageInterval = 100
+
 -- |Start the evolution process
 start :: FilePath -> IO EvolutionContext
 start fp = init >>= (iter 0)
     where iter :: Int -> EvolutionContext -> IO EvolutionContext
           iter n ec = do  { ec <- mutate ec;
-                            if (n `mod` 100 == 0) 
+                            if (n `mod` imageInterval == 0)
                             then drawingToFile (drawing ec) n
                             else return ();
                              iter (n + 1) ec; }

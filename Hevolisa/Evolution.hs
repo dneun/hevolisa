@@ -32,14 +32,13 @@ imageInterval = 100
 
 -- |Start the evolution process
 start :: FilePath -> IO EvolutionContext
-start fp = init >>= (iter 0)
+start fp = withImageFromPNG fp initContext >>= (iter 0)
     where iter :: Int -> EvolutionContext -> IO EvolutionContext
           iter n ec = do  { ec <- mutate ec;
                             if (n `mod` imageInterval == 0)
                             then drawingToFile (drawing ec) n
                             else return ();
                              iter (n + 1) ec; }
-          init = withImageFromPNG fp initContext
 
 -- |Color error, smaller is better
 error :: EvolutionContext -> IO Integer

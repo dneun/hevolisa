@@ -24,7 +24,8 @@ generations = 4000
 
 -- |Init the context with image and initial drawing
 initContext :: [Integer]  -> IO EvolutionContext
-initContext s = randomInit >>= return . flip EvolutionContext s
+initContext image = randomInit >>= \drawing ->
+                    return $ EvolutionContext drawing image
 
 -- |Number of mutations between image writes
 imageInterval = 100

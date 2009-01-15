@@ -20,8 +20,6 @@ data EvolutionContext = EvolutionContext {
       image   :: [Integer]
 } deriving (Show, Eq)
 
-generations = 4000
-
 -- |Init the context with image and initial drawing
 initContext :: [Integer]  -> IO EvolutionContext
 initContext image = randomInit >>= \drawing ->

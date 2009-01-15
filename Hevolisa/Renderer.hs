@@ -12,6 +12,7 @@ module Hevolisa.Renderer (drawingError,
 where
 
 import Data.ByteString (unpack)
+import Directory
 import qualified Graphics.Rendering.Cairo as C
 import Hevolisa.Shapes.DnaDrawing
 import Hevolisa.Shapes.DnaPolygon
@@ -80,10 +81,14 @@ unpackSurface s = C.imageSurfaceGetData s >>=
 withImageFromPNG :: FilePath -> ([Integer] -> IO a) -> IO a
 withImageFromPNG fp f = C.withImageSurfaceFromPNG fp unpackSurface >>= f
                  
-drawingToFile :: DnaDrawing -> IO ()
-drawingToFile d = C.withImageSurface C.FormatRGB24 width height $ \result -> do
-                    C.renderWith result $ render d
-                    C.surfaceWriteToPNG result "result.png"
+drawingToFile :: DnaDrawing -> Int -> IO ()
+drawingToFile d n = C.withImageSurface C.FormatRGB24 width height $ \result -> do
+                      C.renderWith result $ render d
+                      dirExists <- doesDirectoryExist subdir
+                      if dirExists then return () else createDirectory subdir
+                      C.surfaceWriteToPNG result (subdir ++ "/" ++ show n ++ ".png")
+
+subdir = "images"
 
 height = truncate S.maxHeight :: Int
 width  = truncate S.maxWidth  :: Int

@@ -28,10 +28,14 @@ initContext s = randomInit >>= return . flip EvolutionContext s
 
 -- |Start the evolution process
 start :: FilePath -> IO EvolutionContext
-start fp = do ec <- foldl (>>=) init (replicate generations mutate)
-              drawingToFile $ drawing ec
-              return ec
-                  where init = withImageFromPNG fp initContext
+start fp = init >>= (iter 0)
+    where iter :: Int -> EvolutionContext -> IO EvolutionContext
+          iter n ec = do  { ec <- mutate ec;
+                            if (n `mod` 100 == 0) 
+                            then drawingToFile (drawing ec) n
+                            else return ();
+                             iter (n + 1) ec; }
+          init = withImageFromPNG fp initContext
 
 -- |Color error, smaller is better
 error :: EvolutionContext -> IO Integer

@@ -20,6 +20,8 @@ data EvolutionContext = EvolutionContext {
       image   :: [Integer]
 } deriving (Show, Eq)
 
+type Error = Integer
+
 -- |Init the context with image and initial drawing
 initContext :: [Integer]  -> IO EvolutionContext
 initContext image = randomInit >>= \drawing ->
@@ -29,12 +31,18 @@ initContext image = randomInit >>= \drawing ->
 imageInterval = 100
 
 -- |Start the evolution process
-start :: FilePath -> IO EvolutionContext
-start fp = withImageFromPNG fp initContext >>= (iter 0)
+start :: FilePath -> IO (EvolutionContext,Error)
+start fp = do c <- withImageFromPNG fp initContext 
+              e <- error c
+              iter 0 (c,e)
 
 -- |Recursive function combines mutation and writing files
-iter :: Int -> EvolutionContext -> IO EvolutionContext
-iter n ec = mutate ec >>= maybeWriteToFile >>= iter (n + 1)
+iter :: Int -> (EvolutionContext,Error) -> IO (EvolutionContext,Error)
+iter n (c1,e1) = do maybeWriteToFile c1
+                    c2 <- mutate c1
+                    e2 <- error c2
+                    (c,e) <- if e1 < e2 then return (c1,e1) else return (c2,e2)
+                    trace (show e) $ iter (n + 1) (c,e)
     where maybeWriteToFile
               | isTimeToWrite = \ec -> drawingToFile (drawing ec) n >> return ec
               | otherwise     = return
@@ -46,15 +54,7 @@ error (EvolutionContext drawing source) = drawingError drawing source
 
 -- |EvolutionContext mutates minimizing the error
 instance Mutable EvolutionContext where
-    mutate c = do (context,error) <- step c
-                  trace (show error) $ return context
-
--- |Single evolution step, minimize error
-step :: EvolutionContext -> IO (EvolutionContext,Integer)
-step ec = do next <- mutateEvolutionContext ec
-             e1 <- error ec
-             e2 <- error next
-             if e1 < e2 then return (ec,e1) else return (next,e2)
+    mutate = mutateEvolutionContext
 
 -- |Mutate the drawing in the EvolutionContext
 mutateEvolutionContext :: EvolutionContext -> IO EvolutionContext

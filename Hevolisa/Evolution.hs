@@ -46,8 +46,8 @@ iter n (c1,e1) = do maybeWriteToFile c1
               | isTimeToWrite = \ec -> drawingToFile (drawing ec) n >> return ec
               | otherwise     = return
           isTimeToWrite = n `mod` imageInterval == 0
-          minError (c1,e1)(c2,e2) | e1 < e2   = (c1,e1)
-                                  | otherwise = (c2,e2)
+          minError (c1,e1)(c2,e2) | e1 < e2   = trace (show e1) $ (c1,e1)
+                                  | otherwise = trace (show e2) $ (c2,e2)
 
 -- |Color error, smaller is better
 error :: EvolutionContext -> IO Integer

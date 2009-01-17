@@ -56,7 +56,7 @@ instance (Renderable a) => Renderable [a] where
 --
 -- 3. Compare the color values of the drawing and the image pixel by pixel
 drawingError :: DnaDrawing -- ^ the drawing is rasterized
-             -> [Int]  -- ^ rasterize an image from a file
+             -> PArray Int -- ^ rasterize an image from a file
              -> IO Int -- ^ return the color pixel error
 drawingError drawing image = toSurface (render drawing) >>= 
                              unpackSurface >>= 
@@ -65,8 +65,8 @@ drawingError drawing image = toSurface (render drawing) >>=
 --error :: [Int] -> [Int] -> Int
 --error c1 c2 = sum $ zipWith (\x y -> (x - y)^2) c1 c2
 
-error :: [Int] -> [Int] -> Int
-error c1 c2 = V.error_wrapper (fromList c1) (fromList c2)
+error :: PArray Int -> [Int] -> Int
+error c1 c2 = V.error_wrapper c1 (fromList c2)
                           
 toSurface :: C.Render () -> IO C.Surface
 toSurface r = do surface <- C.createImageSurface C.FormatRGB24 width height
@@ -83,8 +83,9 @@ unpackSurface s = C.imageSurfaceGetData s >>=
       removeAlpha (r:g:b:a:xs) = r:g:b:removeAlpha xs
       removeAlpha _            = Prelude.error "wrong number of color values"
 
-withImageFromPNG :: FilePath -> ([Int] -> IO a) -> IO a
-withImageFromPNG fp f = C.withImageSurfaceFromPNG fp unpackSurface >>= f
+withImageFromPNG :: FilePath -> (PArray Int -> IO a) -> IO a
+withImageFromPNG fp f = C.withImageSurfaceFromPNG fp unpackSurface >>= 
+                        return . fromList >>= f
                  
 drawingToFile :: DnaDrawing -> Int -> IO ()
 drawingToFile d n = C.withImageSurface C.FormatRGB24 width height $ \result -> do

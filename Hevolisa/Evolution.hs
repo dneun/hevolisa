@@ -8,6 +8,7 @@
 
 module Hevolisa.Evolution where
 
+import qualified Data.Array.Parallel.Prelude as P
 import Prelude hiding (error)
 import Hevolisa.Shapes.DnaDrawing
 import Hevolisa.Tools
@@ -17,13 +18,13 @@ import Debug.Trace
 -- |Context contains the current drawing and the source image for comparison
 data EvolutionContext = EvolutionContext {
       drawing :: DnaDrawing,
-      image   :: [Int]
-} deriving (Show, Eq)
+      image   :: P.PArray Int
+} deriving (Show)
 
 type Error = Int
 
 -- |Init the context with image and initial drawing
-initContext :: [Int]  -> IO EvolutionContext
+initContext :: P.PArray Int  -> IO EvolutionContext
 initContext image = randomInit >>= \drawing ->
                     return $ EvolutionContext drawing image
 

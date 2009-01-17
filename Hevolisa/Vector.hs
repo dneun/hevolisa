@@ -1,3 +1,11 @@
+--
+-- Module      : Hevolisa.Vector
+-- Copyright   : (c) Daniel Neun 2009
+-- License     : BSD-style
+-- Maintainer  : daniel.neun@gmx.de
+-- Stability   : experimental
+-- Portability : portable
+
 {-# LANGUAGE PArr #-}
 {-# OPTIONS -fvectorise #-}
 module Hevolisa.Vector where

@@ -11,6 +11,7 @@ module Hevolisa.Renderer (drawingError,
                           drawingToFile) 
 where
 
+import Data.Array.Parallel.PArray
 import Data.ByteString (unpack)
 import Directory
 import qualified Graphics.Rendering.Cairo as C
@@ -19,6 +20,7 @@ import Hevolisa.Shapes.DnaPolygon
 import qualified Hevolisa.Shapes.DnaBrush as B
 import Hevolisa.Shapes.DnaPoint
 import qualified Hevolisa.Settings as S
+import qualified Hevolisa.Vector as V
 
 
 class Renderable a where
@@ -54,22 +56,25 @@ instance (Renderable a) => Renderable [a] where
 --
 -- 3. Compare the color values of the drawing and the image pixel by pixel
 drawingError :: DnaDrawing -- ^ the drawing is rasterized
-             -> [Integer]  -- ^ rasterize an image from a file
-             -> IO Integer -- ^ return the color pixel error
+             -> [Int]  -- ^ rasterize an image from a file
+             -> IO Int -- ^ return the color pixel error
 drawingError drawing image = toSurface (render drawing) >>= 
                              unpackSurface >>= 
-                             return . error image
-    where
-      error :: [Integer] -> [Integer] -> Integer
-      error c1 c2 = sum $ zipWith (\x y -> (x - y)^2) c1 c2
+                             return . Hevolisa.Renderer.error image
+
+--error :: [Int] -> [Int] -> Int
+--error c1 c2 = sum $ zipWith (\x y -> (x - y)^2) c1 c2
+
+error :: [Int] -> [Int] -> Int
+error c1 c2 = V.error_wrapper (fromList c1) (fromList c2)
                           
-      toSurface :: C.Render () -> IO C.Surface
-      toSurface r = do surface <- C.createImageSurface C.FormatRGB24 width height
-                       C.renderWith surface r
-                       return surface
+toSurface :: C.Render () -> IO C.Surface
+toSurface r = do surface <- C.createImageSurface C.FormatRGB24 width height
+                 C.renderWith surface r
+                 return surface
 
 -- | remove the alpha channel
-unpackSurface :: C.Surface -> IO [Integer]
+unpackSurface :: C.Surface -> IO [Int]
 unpackSurface s = C.imageSurfaceGetData s >>=
                   return . removeAlpha . map fromIntegral . unpack
     where
@@ -78,7 +83,7 @@ unpackSurface s = C.imageSurfaceGetData s >>=
       removeAlpha (r:g:b:a:xs) = r:g:b:removeAlpha xs
       removeAlpha _            = Prelude.error "wrong number of color values"
 
-withImageFromPNG :: FilePath -> ([Integer] -> IO a) -> IO a
+withImageFromPNG :: FilePath -> ([Int] -> IO a) -> IO a
 withImageFromPNG fp f = C.withImageSurfaceFromPNG fp unpackSurface >>= f
                  
 drawingToFile :: DnaDrawing -> Int -> IO ()

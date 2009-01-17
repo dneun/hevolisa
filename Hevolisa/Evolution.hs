@@ -17,13 +17,13 @@ import Debug.Trace
 -- |Context contains the current drawing and the source image for comparison
 data EvolutionContext = EvolutionContext {
       drawing :: DnaDrawing,
-      image   :: [Integer]
+      image   :: [Int]
 } deriving (Show, Eq)
 
-type Error = Integer
+type Error = Int
 
 -- |Init the context with image and initial drawing
-initContext :: [Integer]  -> IO EvolutionContext
+initContext :: [Int]  -> IO EvolutionContext
 initContext image = randomInit >>= \drawing ->
                     return $ EvolutionContext drawing image
 
@@ -50,7 +50,7 @@ iter n (c1,e1) = do maybeWriteToFile c1
                                   | otherwise = trace (show e2) $ (c2,e2)
 
 -- |Color error, smaller is better
-error :: EvolutionContext -> IO Integer
+error :: EvolutionContext -> IO Int
 error (EvolutionContext drawing source) = drawingError drawing source
 
 -- |EvolutionContext mutates minimizing the error

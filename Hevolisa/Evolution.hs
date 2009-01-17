@@ -41,12 +41,13 @@ iter :: Int -> (EvolutionContext,Error) -> IO (EvolutionContext,Error)
 iter n (c1,e1) = do maybeWriteToFile c1
                     c2 <- mutate c1
                     e2 <- error c2
-                    (c,e) <- if e1 < e2 then return (c1,e1) else return (c2,e2)
-                    trace (show e) $ iter (n + 1) (c,e)
+                    iter (n + 1) $ minError (c1,e1)(c2,e2)
     where maybeWriteToFile
               | isTimeToWrite = \ec -> drawingToFile (drawing ec) n >> return ec
               | otherwise     = return
           isTimeToWrite = n `mod` imageInterval == 0
+          minError (c1,e1)(c2,e2) | e1 < e2   = (c1,e1)
+                                  | otherwise = (c2,e2)
 
 -- |Color error, smaller is better
 error :: EvolutionContext -> IO Integer

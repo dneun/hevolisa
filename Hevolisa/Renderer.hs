@@ -57,16 +57,10 @@ instance (Renderable a) => Renderable [a] where
 -- 3. Compare the color values of the drawing and the image pixel by pixel
 drawingError :: DnaDrawing -- ^ the drawing is rasterized
              -> PArray Int -- ^ rasterize an image from a file
-             -> IO Int -- ^ return the color pixel error
+             -> IO Int     -- ^ return the color pixel error
 drawingError drawing image = toSurface (render drawing) >>= 
-                             unpackSurface >>= 
-                             return . Hevolisa.Renderer.error image
-
---error :: [Int] -> [Int] -> Int
---error c1 c2 = sum $ zipWith (\x y -> (x - y)^2) c1 c2
-
-error :: PArray Int -> [Int] -> Int
-error c1 c2 = V.error_wrapper c1 (fromList c2)
+                             unpackSurface >>=
+                             return . V.error_wrapper image . fromList
                           
 toSurface :: C.Render () -> IO C.Surface
 toSurface r = do surface <- C.createImageSurface C.FormatRGB24 width height

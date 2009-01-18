@@ -29,7 +29,7 @@ initContext image = randomInit >>= \drawing ->
                     return $ EvolutionContext drawing image
 
 -- |Number of mutations between image writes
-imageInterval = 100
+imageInterval = 1000
 
 -- |Start the evolution process
 start :: FilePath -> IO (EvolutionContext,Error)

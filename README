@@ -1,29 +1,93 @@
 README
 
-HEvoLisa is a Haskell port of the EvoLisa program which can be found here: 
+Hevolisa is an application that tries to approximate a bitmap image with colored
+polygons. It draws a set of random polygons which are changed/mutated in small 
+random steps. There is an error function that compares the bitmap created from 
+the polygons with the original image. If the error between the images is 
+smaller than before then the new image replaces the old. This is done over and 
+over again.
 
+Here is the basic algorithm:
+
+1. Get the current drawing (polygons)
+2. Mutate the polygons in a random way (add, remove points)
+3. Create a bitmap of the polygons in memory
+4. Compare the bitmap with the comparison image using the error function
+5. If the error is smaller then replace the old drawing with the new drawing, 
+else keep the old
+6. Repeat from 1.
+
+The algorithm is not an example of a genetic algorithm. Instead it is a 
+hill-climbing algorithm.
+
+Hevolisa is a Haskell port of the EvoLisa program which can be found here: 
 http://rogeralsing.com/2008/12/07/genetic-programming-evolution-of-mona-lisa/
 [Genetic Programming: Evolution of Mona Lisa - Roger Alsing Weblog].
-
 The original source code (C#) can be found in the FAQ section.
 
-Current status: The evolution part is pretty stable. I finally got the
-rendering part working with a current development version of
-gtk2hs. The gtk2hs method imageSurfaceGetData (Surface -> ByteString)
-is essential for the color error implementation. It is currently only
-available in the development version of gtk2hs. The number of
-evolutionary steps can be defined and after the execution of the steps 
-the current polygon drawing is written to a PNG file.
+
+Implementation:
+
+The Haskell implementation supports the functional paradigm. A drawing is 
+composed from four distinct data objects called shapes:
+
+1. A single point
+2. A brush for different color values
+3. A polygon is a list of points with a brush for color
+4. A drawing is a list of polygons
+
+All four shapes can be mutated, e. g. changed in a random way. There is a 
+typeclass called Mutable which supports this operation. The typeclass 
+RandomInit supports the initialisation of each shape with random values (in a
+given range).
+
+The next step is to render/rasterize the polygons to a bitmap in memory. The 
+rendering is done with Cairo. The gtk2hs library supports the access of the
+GTK Cairo library. The polygons drawing is rendered to a Cairo Surface.
+
+The error function computes the error between the rendered image and the 
+original image. The error function is a function of the color values in each 
+pixel of the images. The error function is the sum of the squared differnces.
+
+Error function:
+f (r1,g1,b1) (r2,g2,b2) = (r1 - r2)^2 + (g1 - g2)^2 + (b1 - b2)^2
+
+The color values are extraced from the Cairo Surface type. Here is the 
+transformation of types from rendering to the result of the error function.
+
+DnaDrawing -> Render -> Surface -> ByteString -> [Word8] -> [Integer] -> Integer
+
+PNG files can be written at a defined interval of mutations. For an interval of
+100 the following files will be created: 0.png 100.png 200.png 300.png ...
+
+
+Profiling/Optimisation
+
+After the basic function worked as hoped I started to do some profiling with
+GHC 6.10.1. The program spent the most of its time in the error function. For
+the image which is 200x200 pixels it is executed 400.000 times (sequentially).
+At this point I thought about using Data Parallel Haskell.
+
+
+Data Parallel Haskell
+
+There are two branches of Hevolisa at the moment:
+
+* master: The conventional implementation of the error function
+
+* vector: Implementation with Data Parallel Haskell
+
+The vector branch contains the DPH implementation. The impact of the error
+function could be reduced significantly. However the conversion function
+fromList ([a] -> PArray a) is now dominant.
 
 TODO List
 
 -> profiling, optimize performance
--> create images at regular intervals
--> update haddock documentation
+-> udpate haddock documentation
 -> upload to hackage
 
 The Future
 
 -> await the next stable release of gtk2hs
 -> create a nice GUI (at the moment there is no user interface)
--> Vectorisation/ GHC/Data Parallel Haskell for the error function

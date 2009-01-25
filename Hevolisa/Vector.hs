@@ -7,7 +7,7 @@
 -- Portability : portable
 
 {-# LANGUAGE PArr #-}
-{-# OPTIONS -fvectorise #-}
+{-# OPTIONS -Odph -fvectorise -fdph-seq #-}
 module Hevolisa.Vector where
 
 import qualified Prelude as P

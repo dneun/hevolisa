@@ -5,9 +5,9 @@ License:	BSD3
 License-file:	LICENSE
 Author:		Daniel Neun
 Maintainer:	daniel.neun@gmx.de
-Build-Depends:	base, haskell98, cairo, gtk, bytestring
+Build-Depends:	base, haskell98, cairo, gtk, bytestring, dph-seq
 Build-Type:	Simple
 
 Executable:	Main
 Main-is:	Main.hs
-ghc-options:	-O2 -prof -auto-all
+ghc-options:	-O2

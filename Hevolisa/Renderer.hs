@@ -11,6 +11,7 @@ module Hevolisa.Renderer (drawingError,
                           drawingToFile) 
 where
 
+import System.FilePath ((</>))
 import Control.Monad
 import Data.ByteString (unpack)
 import Directory
@@ -83,11 +84,11 @@ withImageFromPNG :: FilePath -> ([Integer] -> IO a) -> IO a
 withImageFromPNG fp f = C.withImageSurfaceFromPNG fp unpackSurface >>= f
                  
 drawingToFile :: DnaDrawing -> Int -> IO ()
-drawingToFile d n = C.withImageSurface C.FormatRGB24 width height $ \result -> do
-                      C.renderWith result $ render d
+drawingToFile d n = C.withImageSurface C.FormatRGB24 width height $ \surface -> do
+                      C.renderWith surface $ render d
                       dirExists <- doesDirectoryExist subdir
                       unless dirExists $ createDirectory subdir
-                      C.surfaceWriteToPNG result (subdir ++ "/" ++ show n ++ ".png")
+                      C.surfaceWriteToPNG surface (subdir </> show n ++ ".png")
 
 subdir = "images"
 

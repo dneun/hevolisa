@@ -16,7 +16,6 @@ Extra-Source-Files:
 	Hevolisa/Renderer.hs
 	Hevolisa/Settings.hs
 	Hevolisa/Tools.hs
-	Hevolisa/Vector.hs
 
 Executable:	Main
 Main-is:	Main.hs

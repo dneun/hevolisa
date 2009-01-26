@@ -10,4 +10,4 @@ Build-Type:	Simple
 
 Executable:	Main
 Main-is:	Main.hs
-ghc-options:	-O2
+ghc-options:

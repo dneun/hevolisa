@@ -16,6 +16,8 @@ Extra-Source-Files:
 	Hevolisa/Renderer.hs
 	Hevolisa/Settings.hs
 	Hevolisa/Tools.hs
+Data-Files:
+	mona_lisa_crop.png
 
 Executable:	Main
 Main-is:	Main.hs

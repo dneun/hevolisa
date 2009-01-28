@@ -54,8 +54,12 @@ getRandomNumber :: Random a =>
                 -> IO a  -- ^ Random number action
 getRandomNumber x y = getStdRandom (randomR (x,y))
 
--- |Helper function for control of an action
-when :: Bool -> (a -> IO a) -> a -> Bool -> IO a
+-- |Helper function to get rid of if-then-else
+when :: Bool        -- ^ constraint
+     -> (a -> IO a) -- ^ function
+     -> a           -- ^ unchaged value to pass through
+     -> Bool        -- ^ mutate?
+     -> IO a        -- ^ result action
 when constraint f = flip (awhen constraint f)
     where awhen :: Bool -> (a -> IO a) -> Bool -> (a -> IO a)
           awhen constraint f mutate | mutate && constraint = f

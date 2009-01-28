@@ -52,10 +52,9 @@ mutatePolygon p = maybeAddPoint p >>=
     where
       -- |Add a point if it`s time to do so
       maybeAddPoint :: DnaPolygon -> IO DnaPolygon
-      maybeAddPoint p = maybeMutate activeAddPointMutationRate
-                        (if (pointCount p < activePointsPerPolygonMax) then
-                             addPointAtRandomIndex p else return p)
-                        p
+      maybeAddPoint p = willMutate activeAddPointMutationRate >>=
+                        when (pointCount p < activePointsPerPolygonMax)
+                             addPointAtRandomIndex p
 
       -- |Add a point at a random position between two points
       addPointAtRandomIndex :: DnaPolygon -> IO DnaPolygon
@@ -74,10 +73,9 @@ mutatePolygon p = maybeAddPoint p >>=
 
       -- |Remove a point if it`s time to do so
       maybeRemovePoint :: DnaPolygon -> IO DnaPolygon
-      maybeRemovePoint p = maybeMutate activeRemovePointMutationRate
-                           (if (pointCount p > activePointsPerPolygonMin) then
-                                removePointAtRandomIndex p else return p)
-                           p
+      maybeRemovePoint p = willMutate activeRemovePointMutationRate >>=
+                           when (pointCount p > activePointsPerPolygonMin)
+                                removePointAtRandomIndex p
 
       -- |Remove a random point
       removePointAtRandomIndex :: DnaPolygon -> IO DnaPolygon

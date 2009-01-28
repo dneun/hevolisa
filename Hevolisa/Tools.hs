@@ -13,6 +13,8 @@ module Hevolisa.Tools (
               RandomInit (randomInit),
 
               -- * Utility functions
+              when,
+              willMutate,
               maybeMutate,
               getRandomNumber,
 
@@ -51,6 +53,13 @@ getRandomNumber :: Random a =>
                 -> a     -- ^ Maximum
                 -> IO a  -- ^ Random number action
 getRandomNumber x y = getStdRandom (randomR (x,y))
+
+-- |Helper function for control of an action
+when :: Bool -> (a -> IO a) -> a -> Bool -> IO a
+when constraint f = flip (awhen constraint f)
+    where awhen :: Bool -> (a -> IO a) -> Bool -> (a -> IO a)
+          awhen constraint f mutate | mutate && constraint = f
+                                    | otherwise            = return
 
 -- |Perform a mutation action when it`s time to do so
 maybeMutate :: Integer  -- ^ Mutation rate

@@ -39,9 +39,9 @@ addPolygon ps = do random <- getRandomNumber 0 (length ps)
 
 -- |Drawing has mutable DNA
 instance Mutable DnaDrawing where
-    mutate old = do new <- mutateDrawing old
-                    if (new /= old) then return new else mutate old
-
+    mutate old = mutateDrawing old >>= change
+        where change new | old == new = mutate old
+                         | otherwise  = return new
 
 -- |Basic drawing mutation function
 mutateDrawing :: DnaDrawing -> IO DnaDrawing
@@ -52,17 +52,15 @@ mutateDrawing d = maybeAddPolygon d >>=
     where
       -- |Add a polygon if it`s time to do so and the constraints are met
       maybeAddPolygon :: DnaDrawing -> IO DnaDrawing
-      maybeAddPolygon d = maybeMutate activeAddPolygonMutationRate
-                          (if (polygonsCount d < activePolygonsMax) then 
-                               applyToPolygons addPolygon d else return d)
-                          d
+      maybeAddPolygon d = willMutate  activeAddPolygonMutationRate >>=
+                          when (polygonsCount d < activePolygonsMax)
+                               (applyToPolygons addPolygon) d
                     
       -- |Remove a polygon if it`s time to do so and the constraints are met
       maybeRemovePolygon :: DnaDrawing -> IO DnaDrawing
-      maybeRemovePolygon d = maybeMutate activeRemovePolygonMutationRate
-                             (if (polygonsCount d > activePolygonsMin) then
-                                  applyToPolygons removePolygon d else return d)
-                             d
+      maybeRemovePolygon d = willMutate activeRemovePolygonMutationRate >>=
+                             when (polygonsCount d > activePolygonsMin)
+                                  (applyToPolygons removePolygon) d
 
       -- |Remove a polygon at a random index
       removePolygon :: [DnaPolygon] -> IO [DnaPolygon]
@@ -71,10 +69,9 @@ mutateDrawing d = maybeAddPolygon d >>=
 
       -- |Move a polygon if it`s time to do so and the constraints are met
       maybeMovePolygon :: DnaDrawing -> IO DnaDrawing
-      maybeMovePolygon d = maybeMutate activeMovePolygonMutationRate
-                           (if (polygonsCount d > 0) then
-                                applyToPolygons movePolygon d else return d)
-                           d
+      maybeMovePolygon d = willMutate activeMovePolygonMutationRate >>=
+                           when (polygonsCount d > 0)
+                                (applyToPolygons movePolygon) d
 
       -- |Move a polygon in the list of polygons
       movePolygon :: [DnaPolygon] -> IO [DnaPolygon]

@@ -11,7 +11,7 @@ module Hevolisa.Renderer (drawingError,
                           drawingToFile) 
 where
 
-import System.FilePath ((</>))
+import System.FilePath ((</>),(<.>))
 import Control.Monad
 import Data.ByteString (unpack)
 import Directory
@@ -70,27 +70,30 @@ drawingError drawing image = toSurface (render drawing) >>=
                        C.renderWith surface r
                        return surface
 
--- | remove the alpha channel
+-- | Extract the color values to compute the error
 unpackSurface :: C.Surface -> IO [Integer]
 unpackSurface s = C.imageSurfaceGetData s >>=
                   return . removeAlpha . map fromIntegral . unpack
     where
+      -- remove the alpha channel
       removeAlpha :: [a] -> [a]
       removeAlpha []           = []
       removeAlpha (r:g:b:a:xs) = r:g:b:removeAlpha xs
       removeAlpha _            = Prelude.error "wrong number of color values"
 
+-- | Open an image file and apply the function
 withImageFromPNG :: FilePath -> ([Integer] -> IO a) -> IO a
 withImageFromPNG fp f = C.withImageSurfaceFromPNG fp unpackSurface >>= f
                  
+-- | Rasterize the drawing and save it to a file
 drawingToFile :: DnaDrawing -> Int -> IO ()
 drawingToFile d n = C.withImageSurface C.FormatRGB24 width height $ \surface -> do
                       C.renderWith surface $ render d
                       dirExists <- doesDirectoryExist subdir
                       unless dirExists $ createDirectory subdir
-                      C.surfaceWriteToPNG surface (subdir </> show n ++ ".png")
-
-subdir = "images"
+                      C.surfaceWriteToPNG surface filePath
+    where filePath = subdir </> show n <.> "png"
+          subdir = "images"
 
 height = truncate S.maxHeight :: Int
 width  = truncate S.maxWidth  :: Int

@@ -22,7 +22,7 @@ import qualified Hevolisa.Shapes.DnaBrush as B
 import Hevolisa.Shapes.DnaPoint
 import qualified Hevolisa.Settings as S
 
-
+-- | Render the shapes with cairo
 class Renderable a where
     render :: a -> C.Render ()
 
@@ -51,12 +51,9 @@ instance (Renderable a) => Renderable [a] where
 
 
 -- | 1. Rasterize the drawing
---
--- 2. Load an image from a file and rasterize it
---
--- 3. Compare the color values of the drawing and the image pixel by pixel
+-- 2. Compare the color values of the drawing and the image pixel by pixel
 drawingError :: DnaDrawing -- ^ the drawing is rasterized
-             -> [Integer]  -- ^ rasterize an image from a file
+             -> [Integer]  -- ^ color values of the image
              -> IO Integer -- ^ return the color pixel error
 drawingError drawing image = toSurface (render drawing) >>= 
                              unpackSurface >>= 

@@ -1,6 +1,6 @@
 Name:		hevolisa
 Version:	0.0
-Description:	Haskell port of the glorious EvoLisa polygon image approximator
+Description:	Genetic Mona Lisa problem in Haskell
 License:	BSD3
 License-file:	LICENSE
 Author:		Daniel Neun

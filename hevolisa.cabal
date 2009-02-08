@@ -22,6 +22,6 @@ Extra-Source-Files:
 Data-Files:
 	mona_lisa_crop.png
 
-Executable:	Main
-Main-is:	Main.hs
+Executable:	hevolisa
+Main-is:	Hevolisa.hs
 ghc-options:

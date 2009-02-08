@@ -1,5 +1,5 @@
 --
--- Module      : Main
+-- Module      : Hevolisa
 -- Copyright   : (c) Daniel Neun 2008
 -- License     : BSD-style
 -- Maintainer  : daniel.neun@gmx.de

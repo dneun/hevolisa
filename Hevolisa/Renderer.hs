@@ -12,6 +12,7 @@ module Hevolisa.Renderer (drawingError,
 where
 
 import System.FilePath ((</>),(<.>))
+import System.IO.Error
 import Control.Monad
 import Data.ByteString (unpack)
 import Directory
@@ -80,7 +81,9 @@ unpackSurface s = C.imageSurfaceGetData s >>=
 
 -- | Open an image file and apply the function
 withImageFromPNG :: FilePath -> ([Integer] -> IO a) -> IO a
-withImageFromPNG fp f = C.withImageSurfaceFromPNG fp unpackSurface >>= f
+withImageFromPNG fp f = do fileExists <- doesFileExist fp
+                           unless fileExists $ ioError $ userError ("File does not exist: " ++ fp)
+                           C.withImageSurfaceFromPNG fp unpackSurface >>= f
                  
 -- | Rasterize the drawing and save it to a file
 drawingToFile :: DnaDrawing -> Int -> IO ()

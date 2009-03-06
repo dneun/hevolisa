@@ -8,56 +8,55 @@
 
 module Hevolisa.Evolution where
 
-import Prelude hiding (error)
 import Hevolisa.Shapes.DnaDrawing
 import Hevolisa.Tools
-import Hevolisa.Renderer ( drawingError,drawingToFile,withImageFromPNG)
-import Debug.Trace
+import Hevolisa.Renderer ( drawingDelta, drawingToFile, withImageFromPNG )
 
--- |Context contains the current drawing and the source image for comparison
+-- | Context contains the current drawing and the source image for comparison
 data EvolutionContext = EvolutionContext {
       drawing :: DnaDrawing,
       image   :: [Integer]
 } deriving (Show, Eq)
 
-type Error = Integer
+type Delta = Integer
 
--- |Init the context with image and initial drawing
+-- | Init the context with image and initial drawing
 initContext :: [Integer]  -> IO EvolutionContext
 initContext image = randomInit >>= \drawing ->
                     return $ EvolutionContext drawing image
 
--- |Number of mutations between image writes
-imageInterval = 100
+-- | Number of mutations between image writes
+imageInterval = 1000
 
--- |Start the evolution process
-start :: FilePath -> IO (EvolutionContext,Error)
+-- | Start the evolution process
+start :: FilePath -> IO (EvolutionContext, Delta)
 start fp = do c <- withImageFromPNG fp initContext 
-              e <- error c
+              e <- calculateDelta c
               iter 0 (c,e)
 
--- |Recursive function combines mutation and writing files
-iter :: Int -> (EvolutionContext,Error) -> IO (EvolutionContext,Error)
-iter n (c1,e1) = do trace (show e1) $ maybeWriteToFile c1
-                    c2 <- mutate c1
-                    e2 <- error c2
-                    iter (n + 1) $ minError (c1,e1)(c2,e2)
-    where maybeWriteToFile
-              | isTimeToWrite = \ec -> drawingToFile (drawing ec) n >> return ec
-              | otherwise     = return
-          isTimeToWrite = n `mod` imageInterval == 0
-          minError (c1,e1)(c2,e2) | e1 < e2   = (c1,e1)
-                                  | otherwise = (c2,e2)
+-- | Recursive function combines mutation and writing files
+iter :: Int -> (EvolutionContext, Delta) -> IO (EvolutionContext, Delta)
+iter n (c,e) = do 
+  print e
+  maybeWriteToFile c
+  c' <- mutate c
+  e' <- calculateDelta c'
+  iter (n + 1) $ if e' < e then (c',e') else (c, e)
+    where 
+      maybeWriteToFile
+          | isTimeToWrite = \ec -> drawingToFile (drawing ec) n >> return ec
+          | otherwise     = return
+      isTimeToWrite = n `mod` imageInterval == 0
 
--- |Color error, smaller is better
-error :: EvolutionContext -> IO Integer
-error (EvolutionContext drawing source) = drawingError drawing source
+-- | Color error, smaller is better
+calculateDelta :: EvolutionContext -> IO Integer
+calculateDelta (EvolutionContext drawing source) = drawingDelta drawing source
 
--- |EvolutionContext mutates minimizing the error
+-- | EvolutionContext mutates minimizing the error
 instance Mutable EvolutionContext where
     mutate = mutateEvolutionContext
 
--- |Mutate the drawing in the EvolutionContext
+-- | Mutate the drawing in the EvolutionContext
 mutateEvolutionContext :: EvolutionContext -> IO EvolutionContext
 mutateEvolutionContext (EvolutionContext d s) = do m <- mutate d
                                                    return (EvolutionContext m s)

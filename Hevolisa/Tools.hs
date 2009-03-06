@@ -24,35 +24,35 @@ module Hevolisa.Tools (
               moveElem
 ) where
 
-import Random
+import System.Random
 
--- |Instances of Mutable can mutate their DNA
+-- | Instances of Mutable can mutate their DNA
 class Mutable a where
-    -- |Perform a genetic mutation in a random way
+    -- | Perform a genetic mutation in a random way
     mutate :: a -> IO a
 
--- |Count the points
+-- | Count the points
 class Points a where
-    -- |Count the points
+    -- | Count the points
     pointCount :: (Integral b) => a -> b
 
--- |Initialize a shape with random values
+-- | Initialize a shape with random values
 class RandomInit a where
-    -- |Action that returns a shape with random values
+    -- | Action that returns a shape with random values
     randomInit :: IO a
 
--- |Decide whether it`s time for a mutation
+-- | Decide whether it`s time for a mutation
 willMutate :: Integer  -- ^ Mutation rate 
            -> IO Bool  -- ^ True: Mutate
 willMutate mutationRate = do k <- getRandomNumber 0 mutationRate
                              return (k == 1)
 
--- |Get a random number between min and max
+-- | Get a random number between min and max
 getRandomNumber :: Random a => 
                    a     -- ^ Minimum
                 -> a     -- ^ Maximum
                 -> IO a  -- ^ Random number action
-getRandomNumber x y = getStdRandom (randomR (x,y))
+getRandomNumber x y = getStdRandom (randomR (x, y))
 
 -- |Helper function to get rid of if-then-else
 when :: Bool        -- ^ constraint

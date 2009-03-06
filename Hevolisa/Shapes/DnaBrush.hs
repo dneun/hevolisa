@@ -6,29 +6,28 @@
 -- Stability   : experimental
 -- Portability : portable
 
-module Hevolisa.Shapes.DnaBrush (
-                 DnaBrush,
-                         
-                 -- * Accessors
-                 red, green, blue, alpha
-) where
+module Hevolisa.Shapes.DnaBrush 
+    ( DnaBrush
+    , getRed, getGreen, getBlue, getAlpha
+    ) where
 
+import Data.Word ( Word8 )
 import Hevolisa.Settings
 import Hevolisa.Tools
 
--- |Brush to color polygons
-data DnaBrush = DnaBrush {
-      red   :: Integer,
-      green :: Integer,
-      blue  :: Integer,
-      alpha :: Integer 
-} deriving (Show,Eq,Read)
+-- | Brush to color polygons
+data DnaBrush = DnaBrush 
+    { getRed   :: Integer
+    , getGreen :: Integer
+    , getBlue  :: Integer
+    , getAlpha :: Integer
+    } deriving (Show, Eq, Read)
 
--- |Brush is mutable
+-- | Brush is mutable
 instance Mutable DnaBrush where
     mutate = mutateBrush
 
--- |Initialize brush with random garbage
+-- | Initialize brush with random garbage
 instance RandomInit DnaBrush where
     randomInit = do r <- getRandomNumber 0 255
                     g <- getRandomNumber 0 255

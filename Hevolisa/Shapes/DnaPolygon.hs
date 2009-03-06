@@ -6,13 +6,11 @@
 -- Stability   : experimental
 -- Portability : portable
 
-module Hevolisa.Shapes.DnaPolygon (
-                   DnaPolygon,
-
-                   -- * Accessors
-                   brush,
-                   points
-                  ) where
+module Hevolisa.Shapes.DnaPolygon 
+    ( DnaPolygon
+    , brush
+    , points
+    ) where
 
 import Control.Monad ( replicateM )
 import Hevolisa.Settings

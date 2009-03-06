@@ -6,44 +6,44 @@
 -- Stability   : experimental
 -- Portability : portable
 
-module Hevolisa.Shapes.DnaDrawing ( DnaDrawing,
-                                    -- * Accessors
-                                    polygons
-) where
+module Hevolisa.Shapes.DnaDrawing 
+    ( DnaDrawing
+    , polygons
+    ) where
 
 import Hevolisa.Shapes.DnaPolygon ( DnaPolygon )
 import Hevolisa.Tools
 import Hevolisa.Settings
 
--- |A drawing contains an ordered set of polygons
-data DnaDrawing = DnaDrawing {
-      polygons :: [DnaPolygon] 
-} deriving (Show,Eq,Read)
+-- | A drawing contains an ordered set of polygons
+data DnaDrawing = DnaDrawing 
+    { polygons :: [DnaPolygon] 
+    } deriving (Show, Eq, Read)
 
 
--- |Count the points in the drawing
+-- | Count the points in the drawing
 instance Points DnaDrawing where
     pointCount = sum . map pointCount . polygons
 
--- |Construct and init a new Drawing
+-- | Construct and init a new Drawing
 instance RandomInit DnaDrawing where
     randomInit = mseq (replicate min addPolygon) >>= return . DnaDrawing
         where min = fromIntegral activePolygonsMin
               mseq = foldl (>>=) (return [])
 
--- |Add a new polygon at a random position
+-- | Add a new polygon at a random position
 addPolygon :: [DnaPolygon] -> IO [DnaPolygon]
 addPolygon ps = do random <- getRandomNumber 0 (length ps)
                    polygon <- randomInit
                    return (addElem polygon random ps)
 
--- |Drawing has mutable DNA
+-- | Drawing has mutable DNA
 instance Mutable DnaDrawing where
     mutate old = mutateDrawing old >>= change
         where change new | old == new = mutate old
                          | otherwise  = return new
 
--- |Basic drawing mutation function
+-- | Basic drawing mutation function
 mutateDrawing :: DnaDrawing -> IO DnaDrawing
 mutateDrawing d = maybeAddPolygon d >>= 
                   maybeRemovePolygon >>= 

@@ -21,9 +21,7 @@ data Flag = Help | F FilePath
 
 options :: [OptDescr Flag]
 options = [ Option ['h'] ["help"] (NoArg Help)
-                   "Show this help message",
-            Option ['f'] ["file"] (ReqArg (\s -> F s) "FILE")
-                   "Path to source image file" ]
+                   "Show this help message"]
 
 
 main :: IO ()
@@ -34,10 +32,10 @@ parseArgs = do
   case parse argv of
     (opts,files,[])
         | Help `elem` opts                 -> help
-        | [F path] <- filter (/=Help) opts -> tryStart path
+        | not $ null files                 -> tryStart $ head files
     (_,_,errs)                             -> die errs
   where parse argv = getOpt Permute options argv
-        header = "Usage: hevolisa -f file"
+        header = "Usage: hevolisa PNGFILE"
         info = usageInfo header options
         dump = hPutStrLn stderr
         die errs = dump (concat errs ++ info) >> exitWith (ExitFailure 1)

@@ -39,5 +39,5 @@ activeRemovePointMutationRate = 1500
 activeRemovePolygonMutationRate = 1500
 --addPointMutationRate = 1500
 
-maxWidth = 200.0
-maxHeight = 200.0
+maxWidth = 100.0
+maxHeight = 133.0

@@ -1,5 +1,12 @@
+SRC=/home/scvalex/proj/hevolisa
+
 all:
-	cd /home/alex/proj/hevolisa/ &&\
+	cd $(SRC) &&\
 	cabal configure &&\
 	cabal build &&\
 	./dist/build/hevolisa/hevolisa -f wana.png
+
+clean:
+	cd $(SRC) &&\
+	cabal clean
+

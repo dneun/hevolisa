@@ -29,10 +29,11 @@ initContext image = randomInit >>= \drawing ->
 imageInterval = 1000
 
 -- | Start the evolution process
-start :: FilePath -> IO (EvolutionContext, Delta)
-start fp = do c <- withImageFromPNG fp initContext 
-              e <- calculateDelta c
-              iter 0 (c,e)
+evolve :: FilePath -> IO (EvolutionContext, Delta)
+evolve fp = do 
+  c <- withImageFromPNG fp initContext 
+  e <- calculateDelta c
+  iter 0 (c,e)
 
 -- | Recursive function combines mutation and writing files
 iter :: Int -> (EvolutionContext, Delta) -> IO (EvolutionContext, Delta)

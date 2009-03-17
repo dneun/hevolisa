@@ -8,6 +8,9 @@
 
 module Hevolisa.Settings where
 
+import System.IO.Unsafe ( unsafePerformIO )
+import Data.IORef
+
 activeAddPointMutationRate = 1500
 activeAddPolygonMutationRate = 700
 activeAlphaMutationRate = 1500
@@ -39,5 +42,6 @@ activeRemovePointMutationRate = 1500
 activeRemovePolygonMutationRate = 1500
 --addPointMutationRate = 1500
 
-maxWidth = 100.0
-maxHeight = 133.0
+maxWidth, maxHeight :: IORef Double
+maxWidth = unsafePerformIO $ newIORef 100.0
+maxHeight = unsafePerformIO $ newIORef 133.0

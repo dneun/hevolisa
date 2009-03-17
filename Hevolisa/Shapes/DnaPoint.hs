@@ -17,6 +17,7 @@ module Hevolisa.Shapes.DnaPoint (
                  randomPoint
                 ) where
 
+import Data.IORef
 import Hevolisa.Settings
 import Hevolisa.Tools
 
@@ -32,34 +33,37 @@ instance Mutable DnaPoint where
 
 -- |Initialize point with random garbage
 instance RandomInit DnaPoint where
-    randomInit = do x <- getRandomNumber 0.0 maxWidth
-                    y <- getRandomNumber 0.0 maxHeight
-                    return (DnaPoint x y)
+    randomInit = do
+      [mw, mh] <- mapM readIORef [maxWidth, maxHeight]
+      x <- getRandomNumber 0.0 mw
+      y <- getRandomNumber 0.0 mh
+      return (DnaPoint x y)
 
 -- |Mutate points dna randomly, rates can be adjusted
 mutatePoint :: DnaPoint -> IO DnaPoint
 mutatePoint p = mutateMax p >>= mutateMid >>= mutateMin
     where mutateMax   = maybeMutate activeMovePointMaxMutationRate randomInit
           mutateMid p = maybeMutate activeMovePointMidMutationRate 
-                        (pointFunction midX midY p) p
+                        (pointFunction midP midP p) p
           mutateMin p = maybeMutate activeMovePointMinMutationRate 
-                        (pointFunction minX minY p) p
+                        (pointFunction minP minP p) p
 
           -- |Change the x and y values of the point with functions
-          pointFunction :: (Double -> IO Double) -- ^ Function to change the x value
-                        -> (Double -> IO Double) -- ^ Function to change the y value
+          pointFunction :: (Double -> Double -> IO Double) -- ^ Function to change the x value
+                        -> (Double -> Double -> IO Double) -- ^ Function to change the y value
                         -> DnaPoint              -- ^ Original point
                         -> IO DnaPoint           -- ^ Changed point (action)
-          pointFunction fx fy p = do x <- fx $ pointX p
-                                     y <- fy $ pointY p
-                                     return (DnaPoint x y)
+          pointFunction fx fy p = do 
+              mw <- readIORef maxWidth 
+              x <- fx mw $ pointX p
+              mh <- readIORef maxHeight
+              y <- fy mh $ pointY p
+              return (DnaPoint x y)
 
           -- |Helper functions for different ranges
-          midX, midY, minX, minY :: Double -> IO Double
-          midX = mutateDim activeMovePointRangeMid maxWidth
-          midY = mutateDim activeMovePointRangeMid maxHeight
-          minX = mutateDim activeMovePointRangeMin maxWidth
-          minY = mutateDim activeMovePointRangeMin maxHeight
+          midP, minP :: Double -> Double -> IO Double
+          midP = mutateDim activeMovePointRangeMid
+          minP = mutateDim activeMovePointRangeMin
 
 -- |Mutate a one-dimensional value
 mutateDim :: Double    -- ^ Randomisation range
@@ -71,6 +75,9 @@ mutateDim range maxn n = getRandomNumber (-range) range >>=
 
 -- |Create a random point using another point
 randomPoint :: DnaPoint -> IO DnaPoint
-randomPoint (DnaPoint x y) = do x <- mutateDim 3 maxWidth x
-                                y <- mutateDim 3 maxHeight y
-                                return (DnaPoint x y)
+randomPoint (DnaPoint x y) = do 
+      mw <- readIORef maxWidth
+      x <- mutateDim 3 mw x
+      mh <- readIORef maxHeight
+      y <- mutateDim 3 mh y
+      return (DnaPoint x y)

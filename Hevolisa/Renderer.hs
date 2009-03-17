@@ -16,6 +16,7 @@ import System.FilePath ((</>), (<.>))
 import System.IO.Error
 import Control.Monad
 import Data.ByteString (unpack)
+import Data.IORef
 import Directory
 import qualified Graphics.Rendering.Cairo as C
 import Hevolisa.Shapes.DnaDrawing
@@ -65,9 +66,12 @@ drawingDelta drawing image = toSurface (render drawing) >>=
       delta a b = sum $ zipWith (\x y -> (x-y)^2) a b
                           
       toSurface :: C.Render () -> IO C.Surface
-      toSurface r = do surface <- C.createImageSurface C.FormatRGB24 width height
-                       C.renderWith surface r
-                       return surface
+      toSurface r = do 
+        [mw, mh] <- mapM readIORef [S.maxWidth, S.maxHeight]
+        let [width, height] = map truncate [mw, mh] :: [Int]
+        surface <- C.createImageSurface C.FormatRGB24 width height
+        C.renderWith surface r
+        return surface
 
 -- | Extract the color values to compute the error
 unpackSurface :: C.Surface -> IO [Integer]
@@ -88,13 +92,13 @@ withImageFromPNG fp f = do fileExists <- doesFileExist fp
                  
 -- | Rasterize the drawing and save it to a file
 drawingToFile :: DnaDrawing -> Int -> IO ()
-drawingToFile d n = C.withImageSurface C.FormatRGB24 width height $ \surface -> do
+drawingToFile d n = do
+  [mw, mh] <- mapM readIORef [S.maxWidth, S.maxHeight]
+  let [width, height] = map truncate [mw, mh] :: [Int]
+  C.withImageSurface C.FormatRGB24 width height $ \surface -> do
                       C.renderWith surface $ render d
                       dirExists <- doesDirectoryExist subdir
                       unless dirExists $ createDirectory subdir
                       C.surfaceWriteToPNG surface filePath
     where filePath = subdir </> show n <.> "png"
           subdir = "images"
-
-height = truncate S.maxHeight :: Int
-width  = truncate S.maxWidth  :: Int

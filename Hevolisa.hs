@@ -9,7 +9,7 @@
 
 module Main where
 
-import Hevolisa.Evolution (start)
+import Hevolisa.Evolution ( evolve )
 import System.Console.GetOpt
 import System.Environment (getArgs)
 import System.Exit (ExitCode(..),exitWith)
@@ -40,7 +40,7 @@ parseArgs = do
         dump = hPutStrLn stderr
         die errs = dump (concat errs ++ info) >> exitWith (ExitFailure 1)
         help = dump info                      >> exitWith ExitSuccess
-        tryStart path = do result <- try (start path)
+        tryStart path = do result <- try (evolve path)
                            case result of
                              Left e   -> putStrLn $ show e
                              Right _  -> return ()

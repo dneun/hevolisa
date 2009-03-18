@@ -23,8 +23,8 @@ import Hevolisa.Tools
 
 -- |Mutable Point
 data DnaPoint = DnaPoint {
-      pointX :: Double,
-      pointY :: Double 
+      pointX :: Int,
+      pointY :: Int 
 } deriving (Show,Eq,Read)
 
 -- |DnaPoint is mutable
@@ -35,9 +35,9 @@ instance Mutable DnaPoint where
 instance RandomInit DnaPoint where
     randomInit = do
       [mw, mh] <- mapM readIORef [maxWidth, maxHeight]
-      x <- getRandomNumber 0.0 mw
-      y <- getRandomNumber 0.0 mh
-      return (DnaPoint x y)
+      x <- getRandomNumber 0 mw
+      y <- getRandomNumber 0 mh
+      return $ DnaPoint (fromIntegral x) (fromIntegral y)
 
 -- |Mutate points dna randomly, rates can be adjusted
 mutatePoint :: DnaPoint -> IO DnaPoint
@@ -49,8 +49,8 @@ mutatePoint p = mutateMax p >>= mutateMid >>= mutateMin
                         (pointFunction minP minP p) p
 
           -- |Change the x and y values of the point with functions
-          pointFunction :: (Double -> Double -> IO Double) -- ^ Function to change the x value
-                        -> (Double -> Double -> IO Double) -- ^ Function to change the y value
+          pointFunction :: (Int -> Int -> IO Int) -- ^ Function to change the x value
+                        -> (Int -> Int -> IO Int) -- ^ Function to change the y value
                         -> DnaPoint              -- ^ Original point
                         -> IO DnaPoint           -- ^ Changed point (action)
           pointFunction fx fy p = do 
@@ -61,15 +61,15 @@ mutatePoint p = mutateMax p >>= mutateMid >>= mutateMin
               return (DnaPoint x y)
 
           -- |Helper functions for different ranges
-          midP, minP :: Double -> Double -> IO Double
+          midP, minP :: Int -> Int -> IO Int
           midP = mutateDim activeMovePointRangeMid
           minP = mutateDim activeMovePointRangeMin
 
 -- |Mutate a one-dimensional value
-mutateDim :: Double    -- ^ Randomisation range
-          -> Double    -- ^ Maximum
-          -> Double    -- ^ Original value
-          -> IO Double -- ^ New value (action)
+mutateDim :: Int    -- ^ Randomisation range
+          -> Int    -- ^ Maximum
+          -> Int    -- ^ Original value
+          -> IO Int -- ^ New value (action)
 mutateDim range maxn n = getRandomNumber (-range) range >>=
                          return . min maxn . max 0 . (+ n)
 

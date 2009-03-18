@@ -26,8 +26,8 @@ activeMovePointMaxMutationRate = 1500
 activeMovePointMidMutationRate = 1500
 activeMovePointMinMutationRate = 1500
 
-activeMovePointRangeMid = 20.0
-activeMovePointRangeMin = 3.0
+activeMovePointRangeMid = 20 :: Int
+activeMovePointRangeMin = 3 :: Int
 activeMovePolygonMutationRate = 700
 --activePointsMax = 1500
 --activePointsMin = 0
@@ -42,6 +42,6 @@ activeRemovePointMutationRate = 1500
 activeRemovePolygonMutationRate = 1500
 --addPointMutationRate = 1500
 
-maxWidth, maxHeight :: IORef Double
-maxWidth = unsafePerformIO $ newIORef 100.0
-maxHeight = unsafePerformIO $ newIORef 133.0
+maxWidth, maxHeight :: IORef Int
+maxWidth = unsafePerformIO $ newIORef 0
+maxHeight = unsafePerformIO $ newIORef 0

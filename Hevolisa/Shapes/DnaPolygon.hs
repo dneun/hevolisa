@@ -64,8 +64,8 @@ mutatePolygon p = maybeAddPoint p >>=
       addPoint index pts = left ++ [DnaPoint newX newY] ++ right
           where left = take index pts
                 right = drop index pts
-                newX = (pointX prev + pointX next) / 2
-                newY = (pointY prev + pointY next) / 2
+                newX = (pointX prev + pointX next) `div` 2
+                newY = (pointY prev + pointY next) `div` 2
                 prev = last left
                 next = head right
 

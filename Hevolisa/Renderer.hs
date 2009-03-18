@@ -30,7 +30,7 @@ class Renderable a where
     render :: a -> C.Render ()
 
 instance Renderable DnaPoint where
-    render (DnaPoint x y) = C.lineTo x y
+    render (DnaPoint x y) = C.lineTo (fromIntegral x) (fromIntegral y)
 
 instance Renderable DnaPolygon where
     render p = do
@@ -68,8 +68,7 @@ drawingDelta drawing image = toSurface (render drawing) >>=
       toSurface :: C.Render () -> IO C.Surface
       toSurface r = do 
         [mw, mh] <- mapM readIORef [S.maxWidth, S.maxHeight]
-        let [width, height] = map truncate [mw, mh] :: [Int]
-        surface <- C.createImageSurface C.FormatRGB24 width height
+        surface <- C.createImageSurface C.FormatRGB24 mw mh
         C.renderWith surface r
         return surface
 
@@ -86,16 +85,19 @@ unpackSurface s = C.imageSurfaceGetData s >>=
 
 -- | Open an image file and apply the function
 withImageFromPNG :: FilePath -> ([Integer] -> IO a) -> IO a
-withImageFromPNG fp f = do fileExists <- doesFileExist fp
-                           unless fileExists $ ioError $ userError ("File does not exist: " ++ fp)
-                           C.withImageSurfaceFromPNG fp unpackSurface >>= f
+withImageFromPNG fp f = do
+  fileExists <- doesFileExist fp
+  unless fileExists $ ioError $ userError ("File does not exist: " ++ fp)
+  C.withImageSurfaceFromPNG fp $ \srf -> do
+           C.imageSurfaceGetWidth srf >>= writeIORef S.maxWidth
+           C.imageSurfaceGetHeight srf >>= writeIORef S.maxHeight
+           unpackSurface srf >>= f
                  
 -- | Rasterize the drawing and save it to a file
 drawingToFile :: DnaDrawing -> Int -> IO ()
 drawingToFile d n = do
   [mw, mh] <- mapM readIORef [S.maxWidth, S.maxHeight]
-  let [width, height] = map truncate [mw, mh] :: [Int]
-  C.withImageSurface C.FormatRGB24 width height $ \surface -> do
+  C.withImageSurface C.FormatRGB24 mw mh $ \surface -> do
                       C.renderWith surface $ render d
                       dirExists <- doesDirectoryExist subdir
                       unless dirExists $ createDirectory subdir

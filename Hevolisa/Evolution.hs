@@ -22,8 +22,9 @@ type Delta = Integer
 
 -- | Init the context with image and initial drawing
 initContext :: [Integer]  -> IO EvolutionContext
-initContext image = randomInit >>= \drawing ->
-                    return $ EvolutionContext drawing image
+initContext image = do
+  drawing <- randomInit
+  return $ EvolutionContext drawing image
 
 -- | Number of mutations between image writes
 imageInterval = 1000

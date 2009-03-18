@@ -4,7 +4,7 @@ all:
 	cd $(SRC) &&\
 	cabal configure &&\
 	cabal build &&\
-	./dist/build/hevolisa/hevolisa wana.png
+	./dist/build/hevolisa/hevolisa alex_mic.png
 
 clean:
 	cd $(SRC) &&\

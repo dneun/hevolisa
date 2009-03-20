@@ -24,4 +24,4 @@ Data-Files:
 
 Executable:	hevolisa
 Main-is:	Hevolisa.hs
-ghc-options:	-O2
+ghc-options:	-O2 

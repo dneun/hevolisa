@@ -15,13 +15,13 @@ import Hevolisa.Renderer ( drawingDelta, drawingToFile, withImageFromPNG )
 -- | Context contains the current drawing and the source image for comparison
 data EvolutionContext = EvolutionContext {
       drawing :: DnaDrawing,
-      image   :: [Integer]
+      image   :: [Int]
 } deriving (Show, Eq)
 
 type Delta = Integer
 
 -- | Init the context with image and initial drawing
-initContext :: [Integer]  -> IO EvolutionContext
+initContext :: [Int]  -> IO EvolutionContext
 initContext image = do
   drawing <- randomInit
   return $ EvolutionContext drawing image

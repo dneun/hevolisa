@@ -56,14 +56,14 @@ instance (Renderable a) => Renderable [a] where
 -- | 1. Rasterize the drawing
 -- 2. Compare the color values of the drawing and the image pixel by pixel
 drawingDelta :: DnaDrawing -- ^ the drawing is rasterized
-             -> [Integer]  -- ^ color values of the image
+             -> [Int]  -- ^ color values of the image
              -> IO Integer -- ^ return the color pixel error
 drawingDelta drawing image = toSurface (render drawing) >>= 
                              unpackSurface >>= 
                              return . delta image
     where
-      delta :: [Integer] -> [Integer] -> Integer
-      delta a b = sum $ zipWith (\x y -> (x-y)^2) a b
+      delta :: [Int] -> [Int] -> Integer
+      delta a b = sum $ zipWith (\x y -> fromIntegral (x-y)^2) a b
                           
       toSurface :: C.Render () -> IO C.Surface
       toSurface r = do 
@@ -73,7 +73,7 @@ drawingDelta drawing image = toSurface (render drawing) >>=
         return surface
 
 -- | Extract the color values to compute the error
-unpackSurface :: C.Surface -> IO [Integer]
+unpackSurface :: C.Surface -> IO [Int]
 unpackSurface s = C.imageSurfaceGetData s >>=
                   return . removeAlpha . map fromIntegral . unpack
     where
@@ -84,7 +84,7 @@ unpackSurface s = C.imageSurfaceGetData s >>=
       removeAlpha _            = Prelude.error "wrong number of color values"
 
 -- | Open an image file and apply the function
-withImageFromPNG :: FilePath -> ([Integer] -> IO a) -> IO a
+withImageFromPNG :: FilePath -> ([Int] -> IO a) -> IO a
 withImageFromPNG fp f = do
   fileExists <- doesFileExist fp
   unless fileExists $ ioError $ userError ("File does not exist: " ++ fp)

@@ -16,12 +16,26 @@ import System.Exit (ExitCode(..),exitWith)
 import System.IO (hPutStrLn,stderr,stdout)
 import System.IO.Error
 
-data Flag = Help | F FilePath
+data Flag = Help 
+          | Resize String
             deriving Eq
 
-options :: [OptDescr Flag]
-options = [ Option ['h'] ["help"] (NoArg Help)
-                   "Show this help message"]
+data Options = Options
+    { optHelp :: Bool
+    , optResize :: Float
+    } deriving ( Show )
+
+defaultOptions = Options
+                 { optHelp = False
+                 , optResize = 1.0
+                 }
+
+options :: [OptDescr (Options -> Options)]
+options = [ Option ['h'] ["help"] (NoArg (\opts -> opts { optHelp = True } ))
+                   "Show this help message"
+          , Option [] ["resize"] (ReqArg (\r opts -> opts { optResize = read r } ) "ratio")
+                   "Resize the output images to <ratio> times the original"
+          ]
 
 
 main :: IO ()
@@ -29,18 +43,22 @@ main = parseArgs >> return ()
 
 parseArgs = do
   argv <- getArgs
-  case parse argv of
-    (opts,files,[])
-        | Help `elem` opts                 -> help
-        | not $ null files                 -> tryStart $ head files
-    (_,_,errs)                             -> die errs
-  where parse argv = getOpt Permute options argv
-        header = "Usage: hevolisa PNGFILE"
-        info = usageInfo header options
-        dump = hPutStrLn stderr
-        die errs = dump (concat errs ++ info) >> exitWith (ExitFailure 1)
-        help = dump info                      >> exitWith ExitSuccess
-        tryStart path = do result <- try (evolve path)
-                           case result of
-                             Left e   -> putStrLn $ show e
-                             Right _  -> return ()
+  Just (os, fs) <- parseOpts argv
+  case (os, fs) of
+    (opts, files)
+        | optHelp opts        -> help
+        | not $ null files    -> tryStart $ head files
+  where 
+    parseOpts argv = case getOpt Permute options argv of
+                       (opts, files, []) -> return $ Just (foldl (flip id) defaultOptions opts, files) 
+                       (_, _, errs)      -> die errs >> return Nothing
+    header = "Usage: hevolisa PNGFILE"
+    info = usageInfo header options
+    dump = hPutStrLn stderr
+    die errs = dump (concat errs ++ info) >> exitWith (ExitFailure 1)
+    help = dump info                      >> exitWith ExitSuccess
+    tryStart path = do 
+              result <- try (evolve path)
+              case result of
+                Left e   -> putStrLn $ show e
+                Right _  -> return ()

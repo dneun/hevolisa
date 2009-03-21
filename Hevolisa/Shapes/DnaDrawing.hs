@@ -8,6 +8,7 @@
 
 module Hevolisa.Shapes.DnaDrawing 
     ( DnaDrawing
+    , blankDrawing
     , polygons
     ) where
 
@@ -15,11 +16,16 @@ import Hevolisa.Shapes.DnaPolygon ( DnaPolygon )
 import Hevolisa.Tools
 import Hevolisa.Settings
 
--- | A drawing contains an ordered set of polygons
+-- | A drawing contains an ordered set of polygons.  The constructor
+-- is not exported; instead, use randomInit and blankDrawing.
 data DnaDrawing = DnaDrawing 
     { polygons :: [DnaPolygon] 
+    -- ^ list of polygons that make up the drawing
     } deriving (Show, Eq, Read)
 
+-- | An empty drawing.
+blankDrawing :: DnaDrawing
+blankDrawing = DnaDrawing []
 
 -- | Count the points in the drawing
 instance Points DnaDrawing where
@@ -27,34 +33,35 @@ instance Points DnaDrawing where
 
 -- | Construct and init a new Drawing
 instance RandomInit DnaDrawing where
-    randomInit = mseq (replicate min addPolygon) >>= return . DnaDrawing
+    randomInit imginf = mseq (replicate min (addPolygon imginf)) >>= return . DnaDrawing
         where min = fromIntegral activePolygonsMin
               mseq = foldl (>>=) (return [])
 
 -- | Add a new polygon at a random position
-addPolygon :: [DnaPolygon] -> IO [DnaPolygon]
-addPolygon ps = do random <- getRandomNumber 0 (length ps)
-                   polygon <- randomInit
-                   return (addElem polygon random ps)
+addPolygon :: MutableImageInfo a => a -> [DnaPolygon] -> IO [DnaPolygon]
+addPolygon imginf ps = do 
+  random <- getRandomNumber 0 (length ps)
+  polygon <- randomInit imginf
+  return (addElem polygon random ps)
 
 -- | Drawing has mutable DNA
 instance Mutable DnaDrawing where
-    mutate old = mutateDrawing old >>= change
-        where change new | old == new = mutate old
+    mutate imginf old = mutateDrawing imginf old >>= change
+        where change new | old == new = mutate imginf old
                          | otherwise  = return new
 
 -- | Basic drawing mutation function
-mutateDrawing :: DnaDrawing -> IO DnaDrawing
-mutateDrawing d = maybeAddPolygon d >>= 
-                  maybeRemovePolygon >>= 
-                  maybeMovePolygon >>= 
-                  mutatePolygons
+mutateDrawing :: MutableImageInfo a => a -> DnaDrawing -> IO DnaDrawing
+mutateDrawing imginf d = maybeAddPolygon d >>= 
+                         maybeRemovePolygon >>= 
+                         maybeMovePolygon >>= 
+                         mutatePolygons
     where
       -- |Add a polygon if it`s time to do so and the constraints are met
       maybeAddPolygon :: DnaDrawing -> IO DnaDrawing
       maybeAddPolygon d = willMutate  activeAddPolygonMutationRate >>=
                           when (polygonsCount d < activePolygonsMax)
-                               (applyToPolygons addPolygon) d
+                               (applyToPolygons (addPolygon imginf)) d
                     
       -- |Remove a polygon if it`s time to do so and the constraints are met
       maybeRemovePolygon :: DnaDrawing -> IO DnaDrawing
@@ -81,7 +88,7 @@ mutateDrawing d = maybeAddPolygon d >>=
 
       -- |Mutate polygons if it`s time to do so and the constraints are met
       mutatePolygons :: DnaDrawing -> IO DnaDrawing
-      mutatePolygons = applyToPolygons (mapM mutate)
+      mutatePolygons = applyToPolygons (mapM (mutate imginf))
 
       -- |Apply a polygon function to a drawing
       applyToPolygons :: ([DnaPolygon] -> IO [DnaPolygon])

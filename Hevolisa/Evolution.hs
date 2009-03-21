@@ -11,20 +11,27 @@ module Hevolisa.Evolution where
 import Hevolisa.Shapes.DnaDrawing
 import Hevolisa.Tools
 import Hevolisa.Renderer ( drawingDelta, drawingToFile, withImageFromPNG )
+import Hevolisa.Settings
 
 -- | Context contains the current drawing and the source image for comparison
 data EvolutionContext = EvolutionContext {
       drawing :: DnaDrawing,
-      image   :: [Int]
+      image   :: [Int],
+      width   :: Int,
+      height  :: Int
 } deriving (Show, Eq)
+
+instance MutableImageInfo EvolutionContext where
+    getWidth = width
+    getHeight = height
 
 type Delta = Integer
 
 -- | Init the context with image and initial drawing
-initContext :: [Int]  -> IO EvolutionContext
-initContext image = do
-  drawing <- randomInit
-  return $ EvolutionContext drawing image
+initContext :: ([Int], Int, Int)  -> IO EvolutionContext
+initContext (image, w, h) = do
+  drawing <- randomInit (EvolutionContext blankDrawing [] w h)
+  return $ EvolutionContext drawing image w h
 
 -- | Number of mutations between image writes
 imageInterval = 1000
@@ -38,27 +45,24 @@ evolve fp = do
 
 -- | Recursive function combines mutation and writing files
 iter :: Int -> (EvolutionContext, Delta) -> IO (EvolutionContext, Delta)
-iter n (c,e) = do 
+iter n (ec, e) = do 
   print e
-  maybeWriteToFile c
-  c' <- mutate c
-  e' <- calculateDelta c'
-  iter (n + 1) $ if e' < e then (c',e') else (c, e)
+  maybeWriteToFile ec
+  ec' <- mutateEvolutionContext ec
+  e' <- calculateDelta ec'
+  iter (n + 1) $ if e' < e then (ec', e') else (ec, e)
     where 
       maybeWriteToFile
-          | isTimeToWrite = \ec -> drawingToFile (drawing ec) n >> return ec
+          | isTimeToWrite = \ec -> drawingToFile (drawing ec) (width ec) (height ec) n >> return ec
           | otherwise     = return
       isTimeToWrite = n `mod` imageInterval == 0
 
 -- | Color error, smaller is better
 calculateDelta :: EvolutionContext -> IO Integer
-calculateDelta (EvolutionContext drawing source) = drawingDelta drawing source
-
--- | EvolutionContext mutates minimizing the error
-instance Mutable EvolutionContext where
-    mutate = mutateEvolutionContext
+calculateDelta (EvolutionContext drawing source w h) = drawingDelta drawing w h source
 
 -- | Mutate the drawing in the EvolutionContext
 mutateEvolutionContext :: EvolutionContext -> IO EvolutionContext
-mutateEvolutionContext (EvolutionContext d s) = do m <- mutate d
-                                                   return (EvolutionContext m s)
+mutateEvolutionContext ec@(EvolutionContext d s w h) = do 
+  m <- mutate ec d
+  return $ EvolutionContext m s w h

@@ -16,7 +16,6 @@ import System.FilePath ((</>), (<.>))
 import System.IO.Error
 import Control.Monad
 import Data.ByteString (unpack)
-import Data.IORef
 import Directory
 import qualified Graphics.Rendering.Cairo as C
 import Hevolisa.Shapes.DnaDrawing
@@ -56,19 +55,19 @@ instance (Renderable a) => Renderable [a] where
 -- | 1. Rasterize the drawing
 -- 2. Compare the color values of the drawing and the image pixel by pixel
 drawingDelta :: DnaDrawing -- ^ the drawing is rasterized
+             -> Int -> Int -- ^ image width and height
              -> [Int]  -- ^ color values of the image
              -> IO Integer -- ^ return the color pixel error
-drawingDelta drawing image = toSurface (render drawing) >>= 
-                             unpackSurface >>= 
-                             return . delta image
+drawingDelta drawing w h image = toSurface (render drawing) >>= 
+                                 unpackSurface >>= 
+                                 return . delta image
     where
       delta :: [Int] -> [Int] -> Integer
       delta a b = sum $ zipWith (\x y -> fromIntegral (x-y)^2) a b
                           
       toSurface :: C.Render () -> IO C.Surface
       toSurface r = do 
-        [mw, mh] <- mapM readIORef [S.maxWidth, S.maxHeight]
-        surface <- C.createImageSurface C.FormatRGB24 mw mh
+        surface <- C.createImageSurface C.FormatRGB24 w h
         C.renderWith surface r
         return surface
 
@@ -84,20 +83,20 @@ unpackSurface s = C.imageSurfaceGetData s >>=
       removeAlpha _            = Prelude.error "wrong number of color values"
 
 -- | Open an image file and apply the function
-withImageFromPNG :: FilePath -> ([Int] -> IO a) -> IO a
+withImageFromPNG :: FilePath -> (([Int], Int, Int) -> IO a) -> IO a
 withImageFromPNG fp f = do
   fileExists <- doesFileExist fp
   unless fileExists $ ioError $ userError ("File does not exist: " ++ fp)
   C.withImageSurfaceFromPNG fp $ \srf -> do
-           C.imageSurfaceGetWidth srf >>= writeIORef S.maxWidth
-           C.imageSurfaceGetHeight srf >>= writeIORef S.maxHeight
-           unpackSurface srf >>= f
+           w <- C.imageSurfaceGetWidth srf
+           h <- C.imageSurfaceGetHeight srf
+           us <- unpackSurface srf
+           return (us, w, h) >>= f
                  
 -- | Rasterize the drawing and save it to a file
-drawingToFile :: DnaDrawing -> Int -> IO ()
-drawingToFile d n = do
-  [mw, mh] <- mapM readIORef [S.maxWidth, S.maxHeight]
-  C.withImageSurface C.FormatRGB24 mw mh $ \surface -> do
+drawingToFile :: DnaDrawing -> Int -> Int -> Int -> IO ()
+drawingToFile d w h n = do
+  C.withImageSurface C.FormatRGB24 w h $ \surface -> do
                       C.renderWith surface $ render d
                       dirExists <- doesDirectoryExist subdir
                       unless dirExists $ createDirectory subdir

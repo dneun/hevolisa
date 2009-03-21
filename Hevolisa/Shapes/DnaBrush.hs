@@ -8,6 +8,9 @@
 
 module Hevolisa.Shapes.DnaBrush 
     ( DnaBrush
+    -- ^ datatype without constructor; use randomInit
+
+    -- * Accesors
     , getRed, getGreen, getBlue, getAlpha
     ) where
 
@@ -25,17 +28,18 @@ data DnaBrush = DnaBrush
 
 -- | Brush is mutable
 instance Mutable DnaBrush where
-    mutate = mutateBrush
+    mutate = \_ -> mutateBrush
 
 -- | Initialize brush with random garbage
 instance RandomInit DnaBrush where
-    randomInit = do r <- getRandomNumber 0 255
-                    g <- getRandomNumber 0 255
-                    b <- getRandomNumber 0 255
-                    a <- getRandomNumber 10 60
-                    return (DnaBrush r g b a)
+    randomInit _ = do 
+      r <- getRandomNumber 0 255
+      g <- getRandomNumber 0 255
+      b <- getRandomNumber 0 255
+      a <- getRandomNumber 10 60
+      return (DnaBrush r g b a)
 
--- |Change the brush values in a semi random way, rates can be adjusted
+-- | Change the brush values in a semi random way, rates can be adjusted
 mutateBrush :: DnaBrush -> IO DnaBrush
 mutateBrush (DnaBrush r g b a) = do r <- maybeMutate_ r activeRedMutationRate 
                                          activeRedRangeMin activeRedRangeMax

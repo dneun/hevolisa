@@ -5,12 +5,15 @@
 -- Maintainer  : daniel.neun@gmx.de
 -- Stability   : experimental
 -- Portability : portable
+--
+-- | All classes within this module are specialized on images.
 
 module Hevolisa.Tools (
               -- * Classes
-              Mutable (mutate),
-              Points (pointCount),
-              RandomInit (randomInit),
+              MutableImageInfo (..),
+              Mutable ( mutate ),
+              Points ( pointCount ),
+              RandomInit ( randomInit ),
 
               -- * Utility functions
               when,
@@ -26,10 +29,16 @@ module Hevolisa.Tools (
 
 import System.Random
 
+-- | Information about the mutated image.  Used to ensure that points
+-- | are withing specified bounds.
+class MutableImageInfo a where
+    getWidth :: a -> Int
+    getHeight :: a -> Int
+
 -- | Instances of Mutable can mutate their DNA
 class Mutable a where
     -- | Perform a genetic mutation in a random way
-    mutate :: a -> IO a
+    mutate :: MutableImageInfo i => i -> a -> IO a
 
 -- | Count the points
 class Points a where
@@ -39,7 +48,7 @@ class Points a where
 -- | Initialize a shape with random values
 class RandomInit a where
     -- | Action that returns a shape with random values
-    randomInit :: IO a
+    randomInit :: MutableImageInfo i => i -> IO a
 
 -- | Decide whether it`s time for a mutation
 willMutate :: Integer  -- ^ Mutation rate 

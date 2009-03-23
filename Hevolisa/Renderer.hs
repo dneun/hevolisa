@@ -10,6 +10,7 @@ module Hevolisa.Renderer
     ( drawingDelta
     , unpackSurface
     , drawingToFile
+    , resizeDrawing
     ) where
 
 import Control.Monad
@@ -51,6 +52,20 @@ instance Renderable DnaDrawing where
 instance (Renderable a) => Renderable [a] where
     render = mapM_ render
 
+-- | Resize shapes
+class Resizable a where
+    resize :: Float -> a -> a
+
+instance Resizable DnaPoint where
+    resize f (DnaPoint x y) = DnaPoint (round $ (fromIntegral x) * f)
+                                       (round $ (fromIntegral y) * f)
+
+instance Resizable DnaPolygon where
+    resize f p = p { points = map (resize f) $ points p }
+
+instance Resizable DnaDrawing where
+    resize f d = d { polygons = map (resize f) $ polygons d }
+
 -- | Render generations
 instance Renderable Int where
     render n = do C.moveTo 10 20
@@ -59,7 +74,8 @@ instance Renderable Int where
                   C.showText $ show n
 
 -- | 1. Rasterize the drawing
--- 2. Compare the color values of the drawing and the image pixel by pixel
+-- 2. Compare the color values of the drawing and the image pixel by
+-- pixel
 drawingDelta :: DnaDrawing -- ^ the drawing is rasterized
              -> Int -> Int -- ^ image width and height
              -> [Int]  -- ^ color values of the image
@@ -77,6 +93,11 @@ drawingDelta drawing w h image = toSurface (render drawing) >>=
         C.renderWith surface r
         return surface
 
+-- | Resize drawing both vertically and horizonally by given
+-- proportion.
+resizeDrawing :: Float -> DnaDrawing -> DnaDrawing
+resizeDrawing = resize 
+
 -- | Extract the color values to compute the error
 unpackSurface :: C.Surface -> IO [Int]
 unpackSurface s = C.imageSurfaceGetData s >>=
@@ -89,8 +110,8 @@ unpackSurface s = C.imageSurfaceGetData s >>=
       removeAlpha _            = Prelude.error "wrong number of color values"
 
 -- | Rasterize the drawing and save it to a file
-drawingToFile :: DnaDrawing -> Int -> Int -> Int -> IO ()
-drawingToFile d w h n = do
+drawingToFile :: DnaDrawing -> Int -> Int -> Int -> Bool -> IO ()
+drawingToFile d w h n sg = do
   C.withImageSurface C.FormatRGB24 w h $ \surface -> do
                       C.renderWith surface $ do render d
                                                 maybeRenderGenerations n
@@ -99,4 +120,4 @@ drawingToFile d w h n = do
                       C.surfaceWriteToPNG surface filePath
     where filePath = subdir </> show n <.> "png"
           subdir = "images"
-          maybeRenderGenerations n = when S.renderGenerationsNumber $ render n
+          maybeRenderGenerations n = when sg $ render n

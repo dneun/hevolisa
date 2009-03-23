@@ -38,4 +38,3 @@ activeRedRangeMin = 0
 activeRemovePointMutationRate = 1500
 activeRemovePolygonMutationRate = 1500
 --addPointMutationRate = 1500
-renderGenerationsNumber = True

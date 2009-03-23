@@ -34,11 +34,13 @@ data Flag = Help
 data Options = Options
     { optHelp :: Bool
     , optResize :: Float
+    , optShowGen :: Bool
     } deriving ( Show )
 
 defaultOptions = Options
                  { optHelp = False
                  , optResize = 1.0
+                 , optShowGen = False
                  }
 
 options :: [OptDescr (Options -> Options)]
@@ -46,6 +48,8 @@ options = [ Option ['h'] ["help"] (NoArg (\opts -> opts { optHelp = True } ))
                    "Show this help message"
           , Option [] ["resize"] (ReqArg (\r opts -> opts { optResize = read r } ) "ratio")
                    "Resize the output images to <ratio> times the original"
+          , Option [] ["show-generation"] (NoArg (\opts -> opts { optShowGen = True} ))
+                   "Show the generation in the top-left corner of the images produced"
           ]
 
 main :: IO ()
@@ -56,6 +60,7 @@ main = do
     (opts, files)
         | optHelp opts        -> help
         | not $ null files    -> start opts (head files) `catch` somethingErred "Main"
+        | otherwise           -> help
   return ()
     where 
       parseOpts argv = case getOpt Permute options argv of
@@ -73,17 +78,25 @@ data Evolver = Evolver
     , sourceHeight :: Int
     }
 
+start :: Options -> FilePath -> IO ()
 start opts path = do
   e <- startEvolution
   let loop i = do
         g <- readChan (echan e)
         printf "Generation %d: d = %d\n" i (delta g)
-        maybeWriteToFile i g
+        if optResize opts == 1.0
+          then maybeWriteToFile i (drawing g) (width g) (height g)
+          else do
+            let f = optResize opts
+                rd = resizeDrawing f $ drawing g
+                rw = round $ (fromIntegral $ width g) * f
+                rh = round $ (fromIntegral $ height g) * f
+            maybeWriteToFile i rd rw rh
         loop $ i+1
   loop 0
       where 
-        maybeWriteToFile n ec
-            | isTimeToWrite n = drawingToFile (drawing ec) (width ec) (height ec) n
+        maybeWriteToFile n d w h
+            | isTimeToWrite n = drawingToFile d w h n ( optShowGen opts )
             | otherwise       = return ()
         isTimeToWrite n = n `mod` writeInterval == 0
         startEvolution = do

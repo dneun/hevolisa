@@ -10,6 +10,7 @@ module Hevolisa.Renderer
     ( drawingDelta
     , unpackSurface
     , drawingToFile
+    , resizeDrawing
     ) where
 
 import Control.Monad
@@ -51,9 +52,23 @@ instance Renderable DnaDrawing where
 instance (Renderable a) => Renderable [a] where
     render = mapM_ render
 
+-- | Resize shapes
+class Resizable a where
+    resize :: Float -> a -> a
+
+instance Resizable DnaPoint where
+    resize f (DnaPoint x y) = DnaPoint (round $ (fromIntegral x) * f)
+                                       (round $ (fromIntegral y) * f)
+
+instance Resizable DnaPolygon where
+    resize f p = p { points = map (resize f) $ points p }
+
+instance Resizable DnaDrawing where
+    resize f d = d { polygons = map (resize f) $ polygons d }
 
 -- | 1. Rasterize the drawing
--- 2. Compare the color values of the drawing and the image pixel by pixel
+-- 2. Compare the color values of the drawing and the image pixel by
+-- pixel
 drawingDelta :: DnaDrawing -- ^ the drawing is rasterized
              -> Int -> Int -- ^ image width and height
              -> [Int]  -- ^ color values of the image
@@ -70,6 +85,11 @@ drawingDelta drawing w h image = toSurface (render drawing) >>=
         surface <- C.createImageSurface C.FormatRGB24 w h
         C.renderWith surface r
         return surface
+
+-- | Resize drawing both vertically and horizonally by given
+-- proportion.
+resizeDrawing :: Float -> DnaDrawing -> DnaDrawing
+resizeDrawing = resize 
 
 -- | Extract the color values to compute the error
 unpackSurface :: C.Surface -> IO [Int]

@@ -51,6 +51,12 @@ instance Renderable DnaDrawing where
 instance (Renderable a) => Renderable [a] where
     render = mapM_ render
 
+-- | Render generations
+instance Renderable Int where
+    render n = do C.moveTo 10 20
+                  C.setFontSize 10
+                  C.setSourceRGB 0 0 1
+                  C.showText $ show n
 
 -- | 1. Rasterize the drawing
 -- 2. Compare the color values of the drawing and the image pixel by pixel
@@ -97,9 +103,11 @@ withImageFromPNG fp f = do
 drawingToFile :: DnaDrawing -> Int -> Int -> Int -> IO ()
 drawingToFile d w h n = do
   C.withImageSurface C.FormatRGB24 w h $ \surface -> do
-                      C.renderWith surface $ render d
+                      C.renderWith surface $ do render d
+                                                maybeRenderGenerations n
                       dirExists <- doesDirectoryExist subdir
                       unless dirExists $ createDirectory subdir
                       C.surfaceWriteToPNG surface filePath
     where filePath = subdir </> show n <.> "png"
           subdir = "images"
+          maybeRenderGenerations n = when S.renderGenerationsNumber $ render n

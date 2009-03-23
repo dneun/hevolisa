@@ -9,7 +9,7 @@
 
 module Main where
 
-import Hevolisa.Evolution ( evolve )
+import Hevolisa.Evolution ( evolve, EvolutionOptions(..) )
 import System.Console.GetOpt
 import System.Environment (getArgs)
 import System.Exit (ExitCode(..),exitWith)
@@ -37,6 +37,10 @@ options = [ Option ['h'] ["help"] (NoArg (\opts -> opts { optHelp = True } ))
                    "Resize the output images to <ratio> times the original"
           ]
 
+evolutionOptions :: Options -> EvolutionOptions
+evolutionOptions opts = EvolutionOptions
+                        { eoResize = optResize opts
+                        }
 
 main :: IO ()
 main = parseArgs >> return ()
@@ -47,7 +51,7 @@ parseArgs = do
   case (os, fs) of
     (opts, files)
         | optHelp opts        -> help
-        | not $ null files    -> tryStart $ head files
+        | not $ null files    -> tryStart opts $ head files
   where 
     parseOpts argv = case getOpt Permute options argv of
                        (opts, files, []) -> return $ Just (foldl (flip id) defaultOptions opts, files) 
@@ -57,8 +61,8 @@ parseArgs = do
     dump = hPutStrLn stderr
     die errs = dump (concat errs ++ info) >> exitWith (ExitFailure 1)
     help = dump info                      >> exitWith ExitSuccess
-    tryStart path = do 
-              result <- try (evolve path)
+    tryStart opts path = do 
+              result <- try (evolve (evolutionOptions opts) path)
               case result of
                 Left e   -> putStrLn $ show e
                 Right _  -> return ()

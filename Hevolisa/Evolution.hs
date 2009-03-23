@@ -36,9 +36,13 @@ initContext (image, w, h) = do
 -- | Number of mutations between image writes
 imageInterval = 1000
 
+data EvolutionOptions = EvolutionOptions
+    { eoResize :: Float
+    }
+
 -- | Start the evolution process
-evolve :: FilePath -> IO (EvolutionContext, Delta)
-evolve fp = do 
+evolve :: EvolutionOptions -> FilePath -> IO (EvolutionContext, Delta)
+evolve _ fp = do 
   c <- withImageFromPNG fp initContext 
   e <- calculateDelta c
   iter 0 (c,e)

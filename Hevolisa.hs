@@ -14,9 +14,11 @@ import Control.Concurrent
 import Control.Concurrent.Chan
 import Control.Exception
 import Control.Monad
+import qualified Graphics.Rendering.Cairo as C
 import Hevolisa.Evolution
-import Hevolisa.Renderer ( drawingToFile )
+import Hevolisa.Renderer
 import System.Console.GetOpt
+import System.Directory
 import System.Environment ( getArgs )
 import System.Exit ( exitFailure, exitSuccess )
 import System.IO ( hPutStrLn, stderr, stdout )
@@ -46,11 +48,6 @@ options = [ Option ['h'] ["help"] (NoArg (\opts -> opts { optHelp = True } ))
                    "Resize the output images to <ratio> times the original"
           ]
 
-evolutionParameters :: Options -> EvolutionParameters
-evolutionParameters opts = EvolutionParameters
-                        { eoResize = optResize opts
-                        }
-
 main :: IO ()
 main = do
   argv <- getArgs
@@ -70,11 +67,16 @@ main = do
       die errs = dump (concat errs ++ info) >> exitFailure
       help = dump info                      >> exitSuccess
 
+data Evolver = Evolver
+    { echan :: Chan EvolutionContext
+    , sourceWidth :: Int
+    , sourceHeight :: Int
+    }
+
 start opts path = do
-  gens <- newChan
-  forkIO $ evolve (evolutionParameters opts) gens path `catch` somethingErred "Evolve"
+  e <- startEvolution
   let loop i = do
-        g <- readChan gens
+        g <- readChan (echan e)
         printf "Generation %d: d = %d\n" i (delta g)
         maybeWriteToFile i g
         loop $ i+1
@@ -84,6 +86,18 @@ start opts path = do
             | isTimeToWrite n = drawingToFile (drawing ec) (width ec) (height ec) n
             | otherwise       = return ()
         isTimeToWrite n = n `mod` writeInterval == 0
+        startEvolution = do
+                    fileExists <- doesFileExist path
+                    unless fileExists $ error $ "File does not exist: " ++ path
+                    gens <- newChan
+                    printf "Hevolisa evolving %s...\n" path
+                    (w, h) <- C.withImageSurfaceFromPNG path $ \srf -> do
+                                w <- C.imageSurfaceGetWidth srf
+                                h <- C.imageSurfaceGetHeight srf
+                                us <- unpackSurface srf
+                                forkIO $ evolve gens w h us `catch` somethingErred "Evolve"
+                                return (w, h)
+                    return $ Evolver gens w h
 
 
 somethingErred :: String -> SomeException -> IO ()

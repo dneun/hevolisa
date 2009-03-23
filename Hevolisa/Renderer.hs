@@ -8,7 +8,7 @@
 
 module Hevolisa.Renderer 
     ( drawingDelta
-    , withImageFromPNG
+    , unpackSurface
     , drawingToFile
     ) where
 
@@ -82,17 +82,6 @@ unpackSurface s = C.imageSurfaceGetData s >>=
       removeAlpha (r:g:b:a:xs) = r:g:b:removeAlpha xs
       removeAlpha _            = Prelude.error "wrong number of color values"
 
--- | Open an image file and apply the function
-withImageFromPNG :: FilePath -> (([Int], Int, Int) -> IO a) -> IO a
-withImageFromPNG fp f = do
-  fileExists <- doesFileExist fp
-  unless fileExists $ ioError $ userError ("File does not exist: " ++ fp)
-  C.withImageSurfaceFromPNG fp $ \srf -> do
-           w <- C.imageSurfaceGetWidth srf
-           h <- C.imageSurfaceGetHeight srf
-           us <- unpackSurface srf
-           return (us, w, h) >>= f
-                 
 -- | Rasterize the drawing and save it to a file
 drawingToFile :: DnaDrawing -> Int -> Int -> Int -> IO ()
 drawingToFile d w h n = do

@@ -11,7 +11,7 @@ module Hevolisa.Evolution where
 import Control.Concurrent.Chan
 import Hevolisa.Shapes.DnaDrawing
 import Hevolisa.Tools
-import Hevolisa.Renderer ( drawingDelta, withImageFromPNG )
+import Hevolisa.Renderer
 import Hevolisa.Settings
 
 type Delta = Integer
@@ -29,21 +29,16 @@ instance MutableImageInfo EvolutionContext where
     getWidth = width
     getHeight = height
 
-data EvolutionParameters = EvolutionParameters
-    { eoResize :: Float
-    }
-
 -- | Init the context with image and initial drawing
-initContext :: ([Int], Int, Int)  -> IO EvolutionContext
-initContext (image, w, h) = do
+initContext :: [Int] -> Int -> Int -> IO EvolutionContext
+initContext image w h = do
   drawing <- randomInit (EvolutionContext blankDrawing [] (-1) w h)
   return $ EvolutionContext drawing image (-1) w h
 
 -- | Start the evolution process
-evolve :: EvolutionParameters -> Chan EvolutionContext -> FilePath -> IO ()
-evolve _ gens fp = do 
-  c <- withImageFromPNG fp initContext 
-  c <- updateDelta c
+evolve :: Chan EvolutionContext -> Int -> Int -> [Int] -> IO ()
+evolve gens w h srf = do
+  c <- updateDelta =<< initContext srf w h
   iter gens 0 c
 
 -- | Recursive function combines mutation and writing files
@@ -51,7 +46,6 @@ iter :: Chan EvolutionContext -> Int -> EvolutionContext -> IO ()
 iter gens n ec = do 
   writeChan gens ec
   ec' <- mutateEvolutionContext ec
-  ec' <- updateDelta ec'
   iter gens (n + 1) $ if delta ec' < delta ec then ec' else ec
 
 -- | Color error, smaller is better
@@ -64,4 +58,5 @@ updateDelta ec = do
 mutateEvolutionContext :: EvolutionContext -> IO EvolutionContext
 mutateEvolutionContext ec = do 
   d' <- mutate ec (drawing ec)
-  return $ ec { drawing = d' }
+  ec' <- updateDelta ec { drawing = d' }
+  return ec'

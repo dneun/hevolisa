@@ -8,15 +8,19 @@
 
 module Hevolisa.Evolution where
 
+import Control.Concurrent.Chan
 import Hevolisa.Shapes.DnaDrawing
 import Hevolisa.Tools
-import Hevolisa.Renderer ( drawingDelta, drawingToFile, withImageFromPNG )
+import Hevolisa.Renderer ( drawingDelta, withImageFromPNG )
 import Hevolisa.Settings
+
+type Delta = Integer
 
 -- | Context contains the current drawing and the source image for comparison
 data EvolutionContext = EvolutionContext {
       drawing :: DnaDrawing,
       image   :: [Int],
+      delta   :: Delta,
       width   :: Int,
       height  :: Int
 } deriving (Show, Eq)
@@ -25,48 +29,39 @@ instance MutableImageInfo EvolutionContext where
     getWidth = width
     getHeight = height
 
-type Delta = Integer
+data EvolutionParameters = EvolutionParameters
+    { eoResize :: Float
+    }
 
 -- | Init the context with image and initial drawing
 initContext :: ([Int], Int, Int)  -> IO EvolutionContext
 initContext (image, w, h) = do
-  drawing <- randomInit (EvolutionContext blankDrawing [] w h)
-  return $ EvolutionContext drawing image w h
-
--- | Number of mutations between image writes
-imageInterval = 1000
-
-data EvolutionOptions = EvolutionOptions
-    { eoResize :: Float
-    }
+  drawing <- randomInit (EvolutionContext blankDrawing [] (-1) w h)
+  return $ EvolutionContext drawing image (-1) w h
 
 -- | Start the evolution process
-evolve :: EvolutionOptions -> FilePath -> IO (EvolutionContext, Delta)
-evolve _ fp = do 
+evolve :: EvolutionParameters -> Chan EvolutionContext -> FilePath -> IO ()
+evolve _ gens fp = do 
   c <- withImageFromPNG fp initContext 
-  e <- calculateDelta c
-  iter 0 (c,e)
+  c <- updateDelta c
+  iter gens 0 c
 
 -- | Recursive function combines mutation and writing files
-iter :: Int -> (EvolutionContext, Delta) -> IO (EvolutionContext, Delta)
-iter n (ec, e) = do 
-  print e
-  maybeWriteToFile ec
+iter :: Chan EvolutionContext -> Int -> EvolutionContext -> IO ()
+iter gens n ec = do 
+  writeChan gens ec
   ec' <- mutateEvolutionContext ec
-  e' <- calculateDelta ec'
-  iter (n + 1) $ if e' < e then (ec', e') else (ec, e)
-    where 
-      maybeWriteToFile
-          | isTimeToWrite = \ec -> drawingToFile (drawing ec) (width ec) (height ec) n >> return ec
-          | otherwise     = return
-      isTimeToWrite = n `mod` imageInterval == 0
+  ec' <- updateDelta ec'
+  iter gens (n + 1) $ if delta ec' < delta ec then ec' else ec
 
 -- | Color error, smaller is better
-calculateDelta :: EvolutionContext -> IO Integer
-calculateDelta (EvolutionContext drawing source w h) = drawingDelta drawing w h source
+updateDelta :: EvolutionContext -> IO EvolutionContext
+updateDelta ec = do
+  d' <- drawingDelta (drawing ec) (width ec) (height ec) (image ec)
+  return ec { delta = d' }
 
 -- | Mutate the drawing in the EvolutionContext
 mutateEvolutionContext :: EvolutionContext -> IO EvolutionContext
-mutateEvolutionContext ec@(EvolutionContext d s w h) = do 
-  m <- mutate ec d
-  return $ EvolutionContext m s w h
+mutateEvolutionContext ec = do 
+  d' <- mutate ec (drawing ec)
+  return $ ec { drawing = d' }

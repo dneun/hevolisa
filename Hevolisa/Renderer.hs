@@ -12,17 +12,17 @@ module Hevolisa.Renderer
     , drawingToFile
     ) where
 
-import System.FilePath ((</>), (<.>))
-import System.IO.Error
 import Control.Monad
-import Data.ByteString (unpack)
-import Directory
+import Data.ByteString ( unpack )
 import qualified Graphics.Rendering.Cairo as C
 import Hevolisa.Shapes.DnaDrawing
 import Hevolisa.Shapes.DnaPolygon
 import Hevolisa.Shapes.DnaBrush
 import Hevolisa.Shapes.DnaPoint
 import qualified Hevolisa.Settings as S
+import System.FilePath ((</>), (<.>))
+import System.IO.Error
+import System.Directory
 
 -- | Render the shapes with cairo
 class Renderable a where

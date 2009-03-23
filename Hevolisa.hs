@@ -34,11 +34,13 @@ data Flag = Help
 data Options = Options
     { optHelp :: Bool
     , optResize :: Float
+    , optShowGen :: Bool
     } deriving ( Show )
 
 defaultOptions = Options
                  { optHelp = False
                  , optResize = 1.0
+                 , optShowGen = False
                  }
 
 options :: [OptDescr (Options -> Options)]
@@ -46,6 +48,8 @@ options = [ Option ['h'] ["help"] (NoArg (\opts -> opts { optHelp = True } ))
                    "Show this help message"
           , Option [] ["resize"] (ReqArg (\r opts -> opts { optResize = read r } ) "ratio")
                    "Resize the output images to <ratio> times the original"
+          , Option [] ["show-generation"] (NoArg (\opts -> opts { optShowGen = True} ))
+                   "Show the generation in the top-left corner of the images produced"
           ]
 
 main :: IO ()
@@ -92,7 +96,7 @@ start opts path = do
   loop 0
       where 
         maybeWriteToFile n d w h
-            | isTimeToWrite n = drawingToFile d w h n
+            | isTimeToWrite n = drawingToFile d w h n ( optShowGen opts )
             | otherwise       = return ()
         isTimeToWrite n = n `mod` writeInterval == 0
         startEvolution = do

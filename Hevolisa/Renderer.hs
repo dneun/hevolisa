@@ -66,6 +66,13 @@ instance Resizable DnaPolygon where
 instance Resizable DnaDrawing where
     resize f d = d { polygons = map (resize f) $ polygons d }
 
+-- | Render generations
+instance Renderable Int where
+    render n = do C.moveTo 10 20
+                  C.setFontSize 10
+                  C.setSourceRGB 0 0 1
+                  C.showText $ show n
+
 -- | 1. Rasterize the drawing
 -- 2. Compare the color values of the drawing and the image pixel by
 -- pixel
@@ -103,12 +110,14 @@ unpackSurface s = C.imageSurfaceGetData s >>=
       removeAlpha _            = Prelude.error "wrong number of color values"
 
 -- | Rasterize the drawing and save it to a file
-drawingToFile :: DnaDrawing -> Int -> Int -> Int -> IO ()
-drawingToFile d w h n = do
+drawingToFile :: DnaDrawing -> Int -> Int -> Int -> Bool -> IO ()
+drawingToFile d w h n sg = do
   C.withImageSurface C.FormatRGB24 w h $ \surface -> do
-                      C.renderWith surface $ render d
+                      C.renderWith surface $ do render d
+                                                maybeRenderGenerations n
                       dirExists <- doesDirectoryExist subdir
                       unless dirExists $ createDirectory subdir
                       C.surfaceWriteToPNG surface filePath
     where filePath = subdir </> show n <.> "png"
           subdir = "images"
+          maybeRenderGenerations n = when sg $ render n

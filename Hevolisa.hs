@@ -25,9 +25,6 @@ import System.Exit ( exitFailure, exitSuccess )
 import System.IO ( hPutStrLn, stderr, stdout )
 import Text.Printf ( printf )
 
--- | Number of mutations between image writes
-writeInterval = 100
-
 data Flag = Help 
           | Resize String
             deriving Eq
@@ -37,6 +34,7 @@ data Options = Options
     , optResize :: Double
     , optShowGen :: Bool
     , optSampleSize :: Double
+    , optWriteInterval :: Int
     } deriving ( Show )
 
 defaultOptions = Options
@@ -44,6 +42,7 @@ defaultOptions = Options
                  , optResize = 1.0
                  , optSampleSize = 1.0
                  , optShowGen = False
+                 , optWriteInterval = 1000
                  }
 
 options :: [OptDescr (Options -> Options)]
@@ -55,6 +54,8 @@ options = [ Option ['h'] ["help"] (NoArg (\opts -> opts { optHelp = True } ))
                    "Show the generation in the top-left corner of the images produced"
           , Option [] ["sample-size"] (ReqArg (\r opts -> opts { optSampleSize = read r} ) "ratio")
                    "Scale the image down internally; increases speed but hurts output quality"
+          , Option [] ["write-interval"] (ReqArg (\r opts -> opts { optWriteInterval = read r } ) "interval")
+                   "Write an image every <interval> generations"
           ]
 
 main :: IO ()
@@ -87,7 +88,6 @@ start :: Options -> FilePath -> IO ()
 start opts path = do
   e <- startEvolution
   let opts' = opts { optResize = optResize opts * (1.0 / optSampleSize opts) }
-  print $ optResize opts'
   let loop i = do
         g <- readChan (echan e)
         printf "Generation %d: d = %d\n" i (delta g)
@@ -105,7 +105,7 @@ start opts path = do
         maybeWriteToFile n d w h
             | isTimeToWrite n = drawingToFile d w h n ( optShowGen opts )
             | otherwise       = return ()
-        isTimeToWrite n = n `mod` writeInterval == 0
+        isTimeToWrite n = n `mod` (optWriteInterval opts) == 0
         startEvolution = do
                     fileExists <- doesFileExist path
                     unless fileExists $ error $ "File does not exist: " ++ path

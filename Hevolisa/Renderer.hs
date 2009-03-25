@@ -54,7 +54,7 @@ instance (Renderable a) => Renderable [a] where
 
 -- | Resize shapes
 class Resizable a where
-    resize :: Float -> a -> a
+    resize :: Double -> a -> a
 
 instance Resizable DnaPoint where
     resize f (DnaPoint x y) = DnaPoint (round $ (fromIntegral x) * f)
@@ -95,7 +95,7 @@ drawingDelta drawing w h image = toSurface (render drawing) >>=
 
 -- | Resize drawing both vertically and horizonally by given
 -- proportion.
-resizeDrawing :: Float -> DnaDrawing -> DnaDrawing
+resizeDrawing :: Double -> DnaDrawing -> DnaDrawing
 resizeDrawing = resize 
 
 -- | Extract the color values to compute the error
